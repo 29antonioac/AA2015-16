@@ -1,0 +1,79 @@
+---
+title: "Práctica 1 Aprendizaje Automático"
+author: "Antonio Álvarez Caballero"
+output: pdf_document
+---
+
+# Generación y visualización de datos
+
+En primer lugar, creamos una función que crea un data.frame con valores aleatorios según una distribución uniforme.
+_N_ es el número de filas del data.frame, _dim_ el número de columnas y _rango_ el rango donde estarán los valores.
+
+``` {r uniforme}
+simula_unif <- function(N, dim, rango){
+  res <- data.frame(matrix(nrow = N, ncol = dim))
+
+  for(i in 1:N){
+    res[i,] <- runif(dim, rango[1], rango[length(rango)])
+  }
+
+  return(res)
+}
+```
+
+Del mismo modo creamos una función análoga para la distribución _normal_ o _gaussiana_.
+
+
+``` {r gauss}
+simula_gauss <- function(N, dim, sigma){
+  res <- data.frame(matrix(nrow = N, ncol = dim))
+
+  for(i in 1:N){
+    res[i,] <- rnorm(dim, sd = sqrt(sigma))
+  }
+
+  return(res)
+}
+```
+
+Ahora asignamos los resultados a sendas listas y las dibujamos.
+
+``` {r plotUniforme, echo = FALSE}
+lista1 <- simula_unif(50, 2, -50:50)
+lista2 <- simula_gauss(50, 2, 5:7)
+
+# print(lista1)
+
+plot(lista1[,1], lista1[,2], main = "Distribución uniforme", xlab = "", ylab = "")
+```
+
+
+```{r plotNormal, echo = FALSE}
+plot(lista2[,1], lista2[,2], main = "Distribución normal", xlab = "", ylab = "")
+# abline(a = 2, b = 5)
+```
+
+Ahora escribimos una pequeña función para calular una recta dados dos puntos. Daremos la recta con la ecuación punto pendiente, por lo que tenemos que calcular la pendiente y la desviación.
+
+```{r calculaRecta}
+simulaRecta <- function(intervalo){
+  A <- runif(2, intervalo[1], intervalo[length(intervalo)])
+  B<- runif(2, intervalo[1], intervalo[length(intervalo)])
+  
+  m <- (A[2] - B[2]) / (A[1] - B[1])
+  b <- A[2] - m * A[1]
+  
+  return(c(m,b))
+}
+
+
+```
+
+Generamos un par de números aleatorios y generamos una recta
+
+```{r simulaRecta}
+coeff <- simulaRecta(-50:50)
+
+plot(lista1[,1], lista1[,2], main = "Holi", xlab = "", ylab = "")
+abline(a = coeff[1], b = coeff[2])
+```
