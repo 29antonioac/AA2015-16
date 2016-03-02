@@ -16,6 +16,8 @@ simula_unif <- function(N, dim, rango){
   for(i in 1:N){
     res[i,] <- runif(dim, rango[1], rango[length(rango)])
   }
+  
+  names(res) <- c("X", "Y")
 
   return(res)
 }
@@ -31,49 +33,73 @@ simula_gauss <- function(N, dim, sigma){
   for(i in 1:N){
     res[i,] <- rnorm(dim, sd = sqrt(sigma))
   }
+  
+  names(res) <- c("X", "Y")
 
   return(res)
 }
 ```
 
-Ahora asignamos los resultados a sendas listas y las dibujamos.
+Ahora asignamos los resultados a sendos objetos del tipo _data.frame_ y las dibujamos.
 
-``` {r plotUniforme, echo = FALSE}
-lista1 <- simula_unif(50, 2, -50:50)
-lista2 <- simula_gauss(50, 2, 5:7)
+``` {r datos}
+muestra.uniforme <- simula_unif(50, 2, -50:50)
+muestra.gaussiana <- simula_gauss(50, 2, 5:7)
+```
 
-# print(lista1)
+\newpage
 
-plot(lista1[,1], lista1[,2], main = "Distribución uniforme", xlab = "", ylab = "")
+``` {r plotUniforme}
+plot(muestra.uniforme, main = "Distribución uniforme", xlab = "", ylab = "")
 ```
 
 
-```{r plotNormal, echo = FALSE}
-plot(lista2[,1], lista2[,2], main = "Distribución normal", xlab = "", ylab = "")
-# abline(a = 2, b = 5)
+```{r plotNormal}
+plot(muestra.gaussiana, main = "Distribución normal", xlab = "", ylab = "")
 ```
 
+\newpage
 Ahora escribimos una pequeña función para calular una recta dados dos puntos. Daremos la recta con la ecuación punto pendiente, por lo que tenemos que calcular la pendiente y la desviación.
 
 ```{r calculaRecta}
 simulaRecta <- function(intervalo){
   A <- runif(2, intervalo[1], intervalo[length(intervalo)])
-  B<- runif(2, intervalo[1], intervalo[length(intervalo)])
+  B <- runif(2, intervalo[1], intervalo[length(intervalo)])
   
   m <- (A[2] - B[2]) / (A[1] - B[1])
   b <- A[2] - m * A[1]
   
-  return(c(m,b))
+  return(c(b,m))
 }
 
 
 ```
 
-Generamos un par de números aleatorios y generamos una recta
+Generamos una recta aleatoria en $[-50,50]$
 
 ```{r simulaRecta}
-coeff <- simulaRecta(-50:50)
+rectaPrueba <- simulaRecta(-50:50)
 
-plot(lista1[,1], lista1[,2], main = "Holi", xlab = "", ylab = "")
-abline(a = coeff[1], b = coeff[2])
+plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+abline(coef = rectaPrueba)
 ```
+
+\newpage
+Ahora clasificamos los datos de la muestra uniforme según otra recta aleatoria.
+
+```{r plotClasificado}
+rectaClasificacion <- simulaRecta(-50:50)
+
+plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] > 0 ), 
+       pch = 5)
+points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] <= 0 ), 
+       pch = 3)
+
+abline(coef = rectaClasificacion)
+```
+
+Una vez hemos clasificado los datos con una recta, clasificamos con otro tipo de funciones.
+
+
