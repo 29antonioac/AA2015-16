@@ -93,13 +93,70 @@ rectaClasificacion <- simulaRecta(-50:50)
 plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
 points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] > 0 ), 
-       pch = 5)
+       pch = 5, col = "red")
 points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] <= 0 ), 
-       pch = 3)
+       pch = 3, col = "blue")
 
 abline(coef = rectaClasificacion)
 ```
 
 Una vez hemos clasificado los datos con una recta, clasificamos con otro tipo de funciones.
 
+```{r plotClasificado2, echo = FALSE}
 
+f <- function(x,y) {(x-10)^2 + (y-20)^2 - 400}
+
+x <- seq(-50,50,length=1000)
+y <- seq(-50,50,length=1000)
+z <- outer(x,y,f)
+
+contour(x,y,z,levels=0,drawlabels=FALSE, main=expression((x-10)^2 + (y-20)^2 - 400), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+points(subset(muestra.uniforme, f(X,Y) > 0 ), 
+       pch = 5, col = "red")
+points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
+       pch = 3, col = "blue")
+
+```
+
+```{r plotClasificado3, echo = FALSE}
+
+f <- function(x,y) {0.5*(x+10)^2 + (y-20)^2 - 400}
+
+x <- seq(-50,50,length=1000)
+y <- seq(-50,50,length=1000)
+z <- outer(x,y,f)
+
+contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(0.5*(x+10)^2 + (y-20)^2 - 400), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+points(subset(muestra.uniforme, f(X,Y) > 0 ), 
+       pch = 5, col = "red")
+points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
+       pch = 3, col = "blue")
+
+```
+
+```{r plotClasificado4, echo = FALSE}
+
+f <- function(x,y) {0.5*(x-10)^2 - (y+20)^2 - 400}
+
+x <- seq(-50,50,length=1000)
+y <- seq(-50,50,length=1000)
+z <- outer(x,y,f)
+
+contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(0.5*(x-10)^2 - (y+20)^2 - 400), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+points(subset(muestra.uniforme, f(X,Y) > 0 ), 
+       pch = 5, col = "red")
+points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
+       pch = 3, col = "blue")
+
+```
+
+Matemáticas $\pi + \phi = x$
