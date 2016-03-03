@@ -239,3 +239,69 @@ points(muestra.uniforme.negativa.nueva, pch = "-", col = "blue")
 abline(coef = rectaClasificacion)
 
 ```
+
+# Ajuste del algoritmo Perceptron (PLA)
+
+## Ejercicio 1
+
+Vamos a escribir una función que implemente el algoritmo _Perceptron_ o _PLA_. _Datos_ es un _data.frame_ con cada muestra por fila, _label_ el vector de etiquetas, el cual debe tener la misma longitud que los datos de muestra, *max_iter* es el número máximo de iteraciones del algoritmo y _vini_ es el vector inicial, que debe tener la misma dimensión que los datos.
+
+
+```{r funcionPLA}
+ajusta_PLA <- function(datos, label, max_iter, vini){
+  cambio <- TRUE
+  w <- vini
+  iteraciones <- 0
+  
+  while (cambio && iteraciones < max_iter){
+    cambio <- FALSE
+    for (i in 1:nrow(datos)){
+      x_i <- c(1,as.numeric(datos[i,]))
+      prodEscalar <- sum(t(w) * x_i)
+      if (sign(prodEscalar) != label[i]){
+        cambio <- TRUE
+        w <- w + label[i] * x_i
+        break
+      }
+    }
+    iteraciones <- iteraciones + 1
+  }
+  print(cambio)
+
+  resultado <- list("pesos" = w, "iteraciones" = iteraciones)
+  return (resultado)
+}
+```
+
+## Ejercicio 2
+
+Vamos a hacer una simulación de prueba. Tomamos los datos de la muestra uniforme y un vector de etiquetas aleatorio.
+
+```{r clasificacionPruebaPLA}
+muestra.uniforme.etiquetada <- rbind(cbind(muestra.uniforme.positiva, etiqueta = 1),
+                                     cbind(muestra.uniforme.negativa, etiqueta = -1))
+
+rownames(muestra.uniforme.etiquetada) <- NULL
+
+etiquetas <- t(as.vector(muestra.uniforme.etiquetada["etiqueta"]))
+vini <- rep(0,3)
+
+resultado <- ajusta_PLA(muestra.uniforme, etiquetas, 20000, vini)
+
+w <- resultado$pesos
+iteraciones <- resultado$iteraciones
+
+print(w)
+print(iteraciones)
+
+plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+
+abline(coef = c(-w[1]/w[3], w[2]/w[3]))
+
+points(subset(muestra.uniforme.etiquetada, etiqueta == -1), pch = "-", col = "blue")
+points(subset(muestra.uniforme.etiquetada, etiqueta == 1), pch = "+", col = "red")
+
+```
+
+
