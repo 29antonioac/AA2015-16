@@ -6,6 +6,8 @@ output: pdf_document
 
 # Generación y visualización de datos
 
+## Ejercicio 1
+
 En primer lugar, creamos una función que crea un data.frame con valores aleatorios según una distribución uniforme.
 _N_ es el número de filas del data.frame, _dim_ el número de columnas y _rango_ el rango donde estarán los valores.
 
@@ -23,6 +25,8 @@ simula_unif <- function(N, dim, rango){
 }
 ```
 
+## Ejercicio 2
+
 Del mismo modo creamos una función análoga para la distribución _normal_ o _gaussiana_.
 
 
@@ -39,6 +43,8 @@ simula_gauss <- function(N, dim, sigma){
   return(res)
 }
 ```
+
+## Ejercicios 3 y 4
 
 Ahora asignamos los resultados a sendos objetos del tipo _data.frame_ y las dibujamos.
 
@@ -59,6 +65,8 @@ plot(muestra.gaussiana, main = "Distribución normal", xlab = "", ylab = "")
 ```
 
 \newpage
+## Ejercicio 5
+
 Ahora escribimos una pequeña función para calular una recta dados dos puntos. Daremos la recta con la ecuación punto pendiente, por lo que tenemos que calcular la pendiente y la desviación.
 
 ```{r calculaRecta}
@@ -85,6 +93,9 @@ abline(coef = rectaPrueba)
 ```
 
 \newpage
+
+## Ejercicio 6
+
 Ahora clasificamos los datos de la muestra uniforme según otra recta aleatoria.
 
 ```{r plotClasificado}
@@ -99,6 +110,9 @@ points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion
 
 abline(coef = rectaClasificacion)
 ```
+
+\newpage
+## Ejercicio 7
 
 Una vez hemos clasificado los datos con una recta, clasificamos con otro tipo de funciones.
 
@@ -159,5 +173,27 @@ points(subset(muestra.uniforme, f(X,Y) <= 0 ),
 
 ```
 
+```{r plotClasificado5, echo = FALSE}
+
+f <- function(x,y) {y - 20*x^2 -5*x + 3}
+
+x <- seq(-50,50,length=1000)
+y <- seq(-50,50,length=1000)
+z <- outer(x,y,f)
+
+contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(y - 20*x^2 -5*x + 3), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+points(subset(muestra.uniforme, f(X,Y) > 0 ), 
+       pch = "+", col = "red")
+points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
+       pch = "-", col = "blue")
+
+```
+
 Añadir aquí conclusiones de las regiones nuevas comparadas con la lineal.
 
+## Ejercicio 8
+
+Holi
