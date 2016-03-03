@@ -3,7 +3,11 @@ title: "Práctica 1 Aprendizaje Automático"
 author: "Antonio Álvarez Caballero"
 output: pdf_document
 ---
-
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=70))
+set.seed(123456)
+```
 # Generación y visualización de datos
 
 ## Ejercicio 1
@@ -96,17 +100,19 @@ abline(coef = rectaPrueba)
 
 ## Ejercicio 6
 
-Ahora clasificamos los datos de la muestra uniforme según otra recta aleatoria.
+Ahora clasificamos los datos de la muestra uniforme según otra recta aleatoria. Guardamos las muestras clasificadas para próximos ejercicios.
 
-```{r plotClasificado}
+```{r plotClasificadoRecta, tidy = TRUE}
 rectaClasificacion <- simulaRecta(-50:50)
 
 plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
-points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] > 0 ), 
-       pch = "+", col = "red")
-points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] <= 0 ), 
-       pch = "-", col = "blue")
+muestra.uniforme.positiva <- subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] > 0 )
+
+muestra.uniforme.negativa <- subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] <= 0 )
+
+points(muestra.uniforme.positiva, pch = "+", col = "red")
+points(muestra.uniforme.negativa, pch = "-", col = "blue")
 
 abline(coef = rectaClasificacion)
 ```
@@ -116,7 +122,7 @@ abline(coef = rectaClasificacion)
 
 Una vez hemos clasificado los datos con una recta, clasificamos con otro tipo de funciones.
 
-```{r plotClasificado2, echo = FALSE}
+```{r plotClasificadoF1, echo = FALSE}
 
 f <- function(x,y) {(x-10)^2 + (y-20)^2 - 400}
 
@@ -126,8 +132,6 @@ z <- outer(x,y,f)
 
 contour(x,y,z,levels=0,drawlabels=FALSE, main=expression((x-10)^2 + (y-20)^2 - 400), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
-# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
-
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
        pch = "+", col = "red")
 points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
@@ -135,7 +139,7 @@ points(subset(muestra.uniforme, f(X,Y) <= 0 ),
 
 ```
 
-```{r plotClasificado3, echo = FALSE}
+```{r plotClasificadoF2, echo = FALSE}
 
 f <- function(x,y) {0.5*(x+10)^2 + (y-20)^2 - 400}
 
@@ -145,8 +149,6 @@ z <- outer(x,y,f)
 
 contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(0.5*(x+10)^2 + (y-20)^2 - 400), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
-# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
-
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
        pch = "+", col = "red")
 points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
@@ -154,7 +156,7 @@ points(subset(muestra.uniforme, f(X,Y) <= 0 ),
 
 ```
 
-```{r plotClasificado4, echo = FALSE}
+```{r plotClasificadoF3, echo = FALSE}
 
 f <- function(x,y) {0.5*(x-10)^2 - (y+20)^2 - 400}
 
@@ -164,8 +166,6 @@ z <- outer(x,y,f)
 
 contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(0.5*(x-10)^2 - (y+20)^2 - 400), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
-# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
-
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
        pch = "+", col = "red")
 points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
@@ -173,7 +173,7 @@ points(subset(muestra.uniforme, f(X,Y) <= 0 ),
 
 ```
 
-```{r plotClasificado5, echo = FALSE}
+```{r plotClasificadoF4, echo = FALSE}
 
 f <- function(x,y) {y - 20*x^2 -5*x + 3}
 
@@ -182,8 +182,6 @@ y <- seq(-50,50,length=1000)
 z <- outer(x,y,f)
 
 contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(y - 20*x^2 -5*x + 3), xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
-
-# plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
        pch = "+", col = "red")
@@ -194,6 +192,50 @@ points(subset(muestra.uniforme, f(X,Y) <= 0 ),
 
 Añadir aquí conclusiones de las regiones nuevas comparadas con la lineal.
 
+\newpage
 ## Ejercicio 8
 
-Holi
+Tomamos la muestra clasificada y creamos un vector de booleanos con el 10% _TRUE_ y el restante _FALSE_. Así luego extraeremos una porción de la muestra.
+
+```{r cambiaMuestra, tidy = TRUE}
+
+# Tomamos la porción deseada
+porcion <- 10
+numero.datos.positivos <- ceiling(nrow(muestra.uniforme.positiva) * porcion / 100)
+numero.datos.negativos <- ceiling(nrow(muestra.uniforme.negativa) * porcion / 100)
+
+
+vector.aleatorio.muestras.positivas <- c(rep(FALSE,numero.datos.positivos), 
+                                         rep(TRUE, nrow(muestra.uniforme.positiva) - numero.datos.positivos))
+
+vector.aleatorio.muestras.negativas <- c(rep(FALSE,numero.datos.negativos), 
+                                         rep(TRUE, nrow(muestra.uniforme.negativa) - numero.datos.negativos))
+
+vector.aleatorio.muestras.positivas <- sample(vector.aleatorio.muestras.positivas)
+vector.aleatorio.muestras.negativas <- sample(vector.aleatorio.muestras.negativas)
+
+muestra.uniforme.positiva.nueva <- 
+  muestra.uniforme.positiva[vector.aleatorio.muestras.positivas,]
+muestra.uniforme.negativa.nueva <- 
+  muestra.uniforme.negativa[vector.aleatorio.muestras.negativas,]
+
+muestra.uniforme.positiva.nueva <- rbind(muestra.uniforme.positiva.nueva,
+                                       muestra.uniforme.negativa[!vector.aleatorio.muestras.negativas,])
+
+muestra.uniforme.negativa.nueva <- rbind(muestra.uniforme.negativa.nueva,
+                                         muestra.uniforme.positiva[!vector.aleatorio.muestras.positivas,])
+
+```
+
+Ahora mostramos los nuevos resultados
+
+```{r nuevaMuestraClasificada, echo = FALSE}
+
+plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+points(muestra.uniforme.positiva.nueva, pch = "+", col = "red")
+points(muestra.uniforme.negativa.nueva, pch = "-", col = "blue")
+
+abline(coef = rectaClasificacion)
+
+```
