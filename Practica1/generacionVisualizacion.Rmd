@@ -93,9 +93,9 @@ rectaClasificacion <- simulaRecta(-50:50)
 plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
 points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] > 0 ), 
-       pch = 5, col = "red")
+       pch = "+", col = "red")
 points(subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] <= 0 ), 
-       pch = 3, col = "blue")
+       pch = "-", col = "blue")
 
 abline(coef = rectaClasificacion)
 ```
@@ -115,9 +115,9 @@ contour(x,y,z,levels=0,drawlabels=FALSE, main=expression((x-10)^2 + (y-20)^2 - 4
 # plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
-       pch = 5, col = "red")
+       pch = "+", col = "red")
 points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
-       pch = 3, col = "blue")
+       pch = "-", col = "blue")
 
 ```
 
@@ -134,9 +134,9 @@ contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(0.5*(x+10)^2 + (y-20)^2
 # plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
-       pch = 5, col = "red")
+       pch = "+", col = "red")
 points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
-       pch = 3, col = "blue")
+       pch = "-", col = "blue")
 
 ```
 
@@ -153,10 +153,11 @@ contour(x,y,z,levels=0,drawlabels=FALSE, main=expression(0.5*(x-10)^2 - (y+20)^2
 # plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
 points(subset(muestra.uniforme, f(X,Y) > 0 ), 
-       pch = 5, col = "red")
+       pch = "+", col = "red")
 points(subset(muestra.uniforme, f(X,Y) <= 0 ), 
-       pch = 3, col = "blue")
+       pch = "-", col = "blue")
 
 ```
 
-Matemáticas $\pi + \phi = x$
+Añadir aquí conclusiones de las regiones nuevas comparadas con la lineal.
+
