@@ -107,9 +107,11 @@ rectaClasificacion <- simulaRecta(-50:50)
 
 plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
-muestra.uniforme.positiva <- subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] > 0 )
+muestra.uniforme.etiquetada <- cbind(muestra.uniforme, Etiqueta = sign(muestra.uniforme$Y - rectaClasificacion[2]*muestra.uniforme$X - rectaClasificacion[1]))
 
-muestra.uniforme.negativa <- subset(muestra.uniforme, Y - rectaClasificacion[2]*X - rectaClasificacion[1] <= 0 )
+muestra.uniforme.positiva <- subset(muestra.uniforme.etiquetada, Etiqueta ==  1)
+
+muestra.uniforme.negativa <- subset(muestra.uniforme.etiquetada, Etiqueta == -1)
 
 points(muestra.uniforme.positiva, pch = "+", col = "red")
 points(muestra.uniforme.negativa, pch = "-", col = "blue")
@@ -225,6 +227,9 @@ muestra.uniforme.positiva.nueva <- rbind(muestra.uniforme.positiva.nueva,
 muestra.uniforme.negativa.nueva <- rbind(muestra.uniforme.negativa.nueva,
                                          muestra.uniforme.positiva[!vector.aleatorio.muestras.positivas,])
 
+muestra.uniforme.positiva.nueva$Etiqueta <-  1
+muestra.uniforme.negativa.nueva$Etiqueta <- -1
+
 ```
 
 Ahora mostramos los nuevos resultados
@@ -252,56 +257,175 @@ ajusta_PLA <- function(datos, label, max_iter, vini){
   cambio <- TRUE
   w <- vini
   iteraciones <- 0
+  errores <- 0
+  X <- cbind(1,datos)
   
   while (cambio && iteraciones < max_iter){
     cambio <- FALSE
+    errores <- 0
     for (i in 1:nrow(datos)){
-      x_i <- c(1,as.numeric(datos[i,]))
-      prodEscalar <- sum(t(w) * x_i)
+      x_i <- as.numeric(X[i,])
+      prodEscalar <- crossprod(w,x_i)
       if (sign(prodEscalar) != label[i]){
         cambio <- TRUE
+        errores <- errores + 1
         w <- w + label[i] * x_i
-        break
       }
     }
     iteraciones <- iteraciones + 1
   }
-  print(cambio)
 
-  resultado <- list("pesos" = w, "iteraciones" = iteraciones)
+  resultado <- list("Peso inicial" = vini ,"Pesos" = w, 
+                    "Iteraciones" = iteraciones, "Errores" = errores,
+                    "Recta" = c(-w[1]/w[3], w[2]/w[3]) )
   return (resultado)
 }
 ```
 
+\newpage
 ## Ejercicio 2
 
 Vamos a hacer una simulación de prueba. Tomamos los datos de la muestra uniforme y un vector de etiquetas aleatorio.
 
 ```{r clasificacionPruebaPLA}
-muestra.uniforme.etiquetada <- rbind(cbind(muestra.uniforme.positiva, etiqueta = 1),
-                                     cbind(muestra.uniforme.negativa, etiqueta = -1))
 
-rownames(muestra.uniforme.etiquetada) <- NULL
-
-etiquetas <- t(as.vector(muestra.uniforme.etiquetada["etiqueta"]))
+etiquetas <- t(as.vector(muestra.uniforme.etiquetada["Etiqueta"]))
 vini <- rep(0,3)
 
-resultado <- ajusta_PLA(muestra.uniforme, etiquetas, 20000, vini)
+resultado <- ajusta_PLA(muestra.uniforme, etiquetas, 100, vini)
 
-w <- resultado$pesos
-iteraciones <- resultado$iteraciones
+w <- as.vector(resultado$Pesos)
+iteraciones <- as.numeric(resultado$Iteraciones)
 
-print(w)
 print(iteraciones)
+
+mediaIteraciones <- 0
+
+for (i in 1:10){
+  vini <- runif(3, 0,1)
+  print(vini)
+  resultado <- ajusta_PLA(muestra.uniforme, etiquetas, 100, vini) 
+  mediaIteraciones <- mediaIteraciones + as.numeric(resultado$Iteraciones)
+  print(resultado$Iteraciones)
+}
+mediaIteraciones <- mediaIteraciones / 10
+
+print(mediaIteraciones)
+```
+
+
+De estos resultados podemos decir que si los datos son separables, el _PLA_ converge rápidamente.
+
+## Ejercicio 3
+
+Vamos a ejecutar el _PLA_ con un conjunto de datos no separable.
+
+```{r clasificacionNoSeparable}
+muestra.uniforme.no.separable <- rbind(cbind(muestra.uniforme.positiva.nueva),
+                                       cbind(muestra.uniforme.negativa.nueva))
+
+rownames(muestra.uniforme.no.separable) <- NULL
+
+etiquetas <- t(as.vector(muestra.uniforme.no.separable["Etiqueta"]))
+
+vini <- rep(0,3)
+
+resultado <- ajusta_PLA(muestra.uniforme.no.separable[,c("X","Y")], etiquetas, 10, vini)
+print(resultado$Errores)
+
+resultado <- ajusta_PLA(muestra.uniforme.no.separable[,c("X","Y")], etiquetas, 100, vini)
+print(resultado$Errores)
+
+resultado <- ajusta_PLA(muestra.uniforme.no.separable[,c("X","Y")], etiquetas, 1000, vini)
+print(resultado$Errores)
+```
+
+Visto los resultados, podemos afirmar que sobre un conjunto no separable de datos, el _PLA_ no converge y por tanto no da buenas soluciones por muchas iteraciones que le permitamos.
+
+\newpage
+## Ejercicio 4
+
+Tomemos la función cuadrática del Ejercicio 7 y realicemos el mismo procedimiento.
+
+```{r clasificacionCircular}
+f <- function(x,y) {(x-10)^2 + (y-20)^2 - 400}
+
+muestra.uniforme.circular <- cbind(muestra.uniforme, 
+                                   Etiqueta = sign(f(muestra.uniforme$X, muestra.uniforme$Y)))
+
+etiquetas <- t(as.vector(muestra.uniforme.circular["Etiqueta"]))
+
+vini <- rep(0,3)
+
+resultado <- ajusta_PLA(muestra.uniforme.circular[,c("X","Y")], etiquetas, 10, vini)
+print(resultado$Errores)
+
+resultado <- ajusta_PLA(muestra.uniforme.circular[,c("X","Y")], etiquetas, 100, vini)
+print(resultado$Errores)
+
+resultado <- ajusta_PLA(muestra.uniforme.circular[,c("X","Y")], etiquetas, 1000, vini)
+print(resultado$Errores)
 
 plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
+points(subset(muestra.uniforme.circular,Etiqueta ==  1), pch = "+", col = "red")
+points(subset(muestra.uniforme.circular,Etiqueta == -1), pch = "-", col = "blue")
 
-abline(coef = c(-w[1]/w[3], w[2]/w[3]))
+abline(coef = resultado$Recta)
+```
 
-points(subset(muestra.uniforme.etiquetada, etiqueta == -1), pch = "-", col = "blue")
-points(subset(muestra.uniforme.etiquetada, etiqueta == 1), pch = "+", col = "red")
+Con este conjunto de datos, en los que la separabilidad tiene forma circular, el _PLA_ no sirve absolutamente de nada: contra más iteraciones, menos clasifica al dejar todos los datos a un lado.
 
+\newpage
+## Ejercicio 5
+
+Vamos a modificar la función *ajusta_PLA* para que vaya haciendo plot cada iteración.
+
+```{r ajusta_PLA_Plot}
+
+ajusta_PLA <- function(datos, label, max_iter, vini){
+  cambio <- TRUE
+  w <- vini
+  iteraciones <- 0
+  errores <- 0
+  X <- cbind(1,datos)
+  
+  datos.etiquetados <- cbind(datos, Etiqueta = t(label))
+
+  while (cambio && iteraciones < max_iter){
+    cambio <- FALSE
+    errores <- 0
+    for (i in 1:nrow(datos)){
+      x_i <- as.numeric(X[i,])
+      prodEscalar <- crossprod(w,x_i)
+      if (sign(prodEscalar) != label[i]){
+        cambio <- TRUE
+        errores <- errores + 1
+        w <- w + label[i] * x_i
+      }
+    }
+    ### PLOT
+    recta <- c(-w[1]/w[3], w[2]/w[3])
+    plot(0, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+
+    points(subset(datos.etiquetados,Etiqueta ==  1), pch = "+", col = "red")
+    points(subset(datos.etiquetados,Etiqueta == -1), pch = "-", col = "blue")
+    
+    abline(coef = recta)
+    ##############
+    iteraciones <- iteraciones + 1
+  }
+
+  resultado <- list("Peso inicial" = vini ,"Pesos" = w, 
+                    "Iteraciones" = iteraciones, "Errores" = errores,
+                    "Recta" = c(-w[1]/w[3], w[2]/w[3]) )
+  return (resultado)
+}
+
+vini <- rep(0,3)
+
+resultado <- ajusta_PLA(muestra.uniforme.circular[,c("X","Y")], etiquetas, 10, vini)
+print(resultado$Errores)
 ```
 
 
