@@ -428,4 +428,4 @@ resultado <- ajusta_PLA(muestra.uniforme.circular[,c("X","Y")], etiquetas, 10, v
 print(resultado$Errores)
 ```
 
-
+A la vista de estos resultados, proponemos la siguiente mejora
