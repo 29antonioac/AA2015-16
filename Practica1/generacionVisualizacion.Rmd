@@ -105,16 +105,18 @@ Ahora clasificamos los datos de la muestra uniforme según otra recta aleatoria.
 ```{r plotClasificadoRecta, tidy = TRUE}
 rectaClasificacion <- simulaRecta(-50:50)
 
-plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
-
 muestra.uniforme.etiquetada <- cbind(muestra.uniforme, Etiqueta = sign(muestra.uniforme$Y - rectaClasificacion[2]*muestra.uniforme$X - rectaClasificacion[1]))
 
 muestra.uniforme.positiva <- subset(muestra.uniforme.etiquetada, Etiqueta ==  1)
 
 muestra.uniforme.negativa <- subset(muestra.uniforme.etiquetada, Etiqueta == -1)
 
-points(muestra.uniforme.positiva, pch = "+", col = "red")
-points(muestra.uniforme.negativa, pch = "-", col = "blue")
+formas <- ifelse(muestra.uniforme.etiquetada$Etiqueta == 1, "+" , "-")
+colores <- ifelse(muestra.uniforme.etiquetada$Etiqueta == 1, "red" , "blue")
+
+plot(muestra.uniforme, 
+     pch = formas,
+     col = colores)
 
 abline(coef = rectaClasificacion)
 ```
@@ -277,7 +279,7 @@ ajusta_PLA <- function(datos, label, max_iter, vini){
 
   resultado <- list("Peso inicial" = vini ,"Pesos" = w, 
                     "Iteraciones" = iteraciones, "Errores" = errores,
-                    "Recta" = c(-w[1]/w[3], w[2]/w[3]) )
+                    "Recta" = c(-w[1]/w[3], -w[2]/w[3]) )
   return (resultado)
 }
 ```
@@ -383,7 +385,7 @@ Vamos a modificar la función *ajusta_PLA* para que vaya haciendo plot cada iter
 
 ```{r ajusta_PLA_Plot}
 
-ajusta_PLA <- function(datos, label, max_iter, vini){
+ajusta_PLA_PLOT <- function(datos, label, max_iter, vini){
   cambio <- TRUE
   w <- vini
   iteraciones <- 0
@@ -405,15 +407,18 @@ ajusta_PLA <- function(datos, label, max_iter, vini){
       }
     }
     ### PLOT
-    recta <- c(-w[1]/w[3], w[2]/w[3])
+    recta <- c(-w[1]/w[3], -w[2]/w[3])
     plot(0, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 
     points(subset(datos.etiquetados,Etiqueta ==  1), pch = "+", col = "red")
     points(subset(datos.etiquetados,Etiqueta == -1), pch = "-", col = "blue")
     
     abline(coef = recta)
+    
     ##############
     iteraciones <- iteraciones + 1
+    print(paste("Iteracion", iteraciones))
+    print(paste("Errores:",errores))
   }
 
   resultado <- list("Peso inicial" = vini ,"Pesos" = w, 
@@ -424,8 +429,65 @@ ajusta_PLA <- function(datos, label, max_iter, vini){
 
 vini <- rep(0,3)
 
-resultado <- ajusta_PLA(muestra.uniforme.circular[,c("X","Y")], etiquetas, 10, vini)
+resultado <- ajusta_PLA_PLOT(muestra.uniforme.circular[,c("X","Y")], etiquetas, 15, vini)
 print(resultado$Errores)
 ```
 
-A la vista de estos resultados, proponemos la siguiente mejora
+\newpage
+
+A la vista de estos resultados, proponemos la siguiente mejora: guardar el mejor resultado en una variable y devolverlo.
+
+
+
+```{r funcionPLAMOD}
+ajusta_PLA_MOD <- function(datos, label, max_iter, vini){
+  cambio <- TRUE
+  w <- vini
+  iteraciones <- 0
+  errores <- 0
+  X <- cbind(1,datos)
+  mejor <- vini
+  mejor_errores <- nrow(datos)
+  
+  while (cambio && iteraciones < max_iter){
+    cambio <- FALSE
+    errores <- 0
+    for (i in 1:nrow(datos)){
+      x_i <- as.numeric(X[i,])
+      prodEscalar <- crossprod(w,x_i)
+      if (sign(prodEscalar) != label[i]){
+        cambio <- TRUE
+        errores <- errores + 1
+        w <- w + label[i] * x_i
+      }
+    }
+    if (errores < mejor_errores){
+      mejor <- w
+      mejor_errores <- errores
+    }
+    iteraciones <- iteraciones + 1
+  }
+
+  resultado <- list("Peso inicial" = vini ,"Pesos" = mejor, 
+                    "Iteraciones" = iteraciones, "Errores" = mejor_errores,
+                    "Recta" = c(-w[1]/w[3], -w[2]/w[3]) )
+  return (resultado)
+}
+```
+
+Si lo ejecutamos con el mismo conjunto de antes nos devuelve
+
+```{r pruebaMOD}
+resultado <- ajusta_PLA_MOD(muestra.uniforme.circular[,c("X","Y")], etiquetas, 15, vini)
+print(resultado$Errores)
+```
+
+\newpage
+
+# Regresión lineal
+
+```{r leerZip}
+archivo  <- read.csv("zip.train", header = FALSE, sep = " ")
+colnames(archivo)[1] <- "ID"
+```
+
