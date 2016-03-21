@@ -489,5 +489,28 @@ print(resultado$Errores)
 ```{r leerZip}
 archivo  <- read.csv("zip.train", header = FALSE, sep = " ")
 colnames(archivo)[1] <- "ID"
+archivo["V258"] <- NULL
+
+numeros_5 <- subset(archivo, ID == 5)
+numeros_5["ID"] <- NULL
+numeros_5 <- data.matrix(numeros_5)
+
+numeros_1 <- subset(archivo, ID == 1)
+numeros_1["ID"] <- NULL
+numeros_1 <- data.matrix(numeros_1)
+
+numeros_5_matrix <- lapply(split(numeros_5, 1:nrow(numeros_5)), 
+                           function(m) { 
+                             mtx <- matrix(0.5*(1-m), nrow = 16, ncol = 16)
+                             return(mtx[,16:1])
+                             })
+image(numeros_5_matrix[[1]], col = gray.colors(256))
+
+numeros_1_matrix <- lapply(split(numeros_1, 1:nrow(numeros_1)), 
+                           function(m) { 
+                             mtx <- matrix(0.5*(1-m), nrow = 16, ncol = 16)
+                             return(mtx[,16:1])
+                             })
+image(numeros_1_matrix[[50]], col = gray.colors(256))
 ```
 
