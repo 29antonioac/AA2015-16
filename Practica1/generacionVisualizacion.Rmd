@@ -486,6 +486,10 @@ print(resultado$Errores)
 
 # Regresión lineal
 
+## Ejercicios 1 y 2
+
+Leeremos los números desde el fichero de entrenamiento y guardaremos las instancias de 1's y 5's en sendas listas de matrices.
+
 ```{r leerZip}
 archivo  <- read.csv("zip.train", header = FALSE, sep = " ")
 colnames(archivo)[1] <- "ID"
@@ -512,5 +516,42 @@ numeros_1_matrix <- lapply(split(numeros_1, 1:nrow(numeros_1)),
                              return(mtx[,16:1])
                              })
 image(numeros_1_matrix[[50]], col = gray.colors(256))
+```
+
+## Ejercicio 3
+
+Para cada número, calcularemos su media y su simetría vertical.
+
+```{r mediaSimetriaVertical}
+medias_1 <- lapply(numeros_1_matrix, mean)
+medias_5 <- lapply(numeros_5_matrix, mean)
+
+simetriaVertical <- function(m) {
+  simetria <- 0
+  for (i in 1:nrow(m)) {
+    for (j in 1:ncol(m)/2) {
+      offset <- abs(m[i,j] - m[i,ncol(m)-j])
+      simetria <- simetria + offset
+      # print(paste("Offset =",offset))
+      # print(paste("Simetria =",simetria))
+      # print(typeof(offset))
+      # print(typeof(simetria))
+    }
+  }
+  simetria <- 2*simetria
+  return(simetria)
+}
+
+# simetrias_1 <- lapply(numeros_1_matrix, simetriaVertical)
+# simetrias_5 <- lapply(numeros_5_matrix, simetriaVertical)
+simetriaVertical(numeros_1_matrix[[3]])
+```
+
+## Ejercicio 4
+
+Ahora representamos en una nube de puntos la simetría y la media de la intensidad de los números.
+
+```{r plotMediaSimetria}
+datos_1 <- data.frame(cbind(medias_1, simetrias_1))
 ```
 
