@@ -574,10 +574,12 @@ regres_lin <- function(datos, label) {
 }
 ```
 
+## Ejercicio 6
+
 Una vez tenemos el algoritmo, lo probamos y dibujamos la recta.
 
 ```{r pruebaRegresion}
-# muestras <- cbind(datos$Medias, datos$Simetrias)
+# muestras <- cbind(datos$Medias, datos$Simetrias)
 # etiquetas <- datos$Etiqueta
 muestras <- datos$Medias
 etiquetas <- datos$Simetrias
