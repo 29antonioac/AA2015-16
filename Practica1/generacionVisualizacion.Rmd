@@ -423,7 +423,7 @@ ajusta_PLA_PLOT <- function(datos, label, max_iter, vini){
 
   resultado <- list("Peso inicial" = vini ,"Pesos" = w, 
                     "Iteraciones" = iteraciones, "Errores" = errores,
-                    "Recta" = c(-w[1]/w[3], w[2]/w[3]) )
+                    "Recta" = c(-w[1]/w[3], -w[2]/w[3]) )
   return (resultado)
 }
 
@@ -526,25 +526,13 @@ Para cada número, calcularemos su media y su simetría vertical.
 medias_1 <- lapply(numeros_1_matrix, mean)
 medias_5 <- lapply(numeros_5_matrix, mean)
 
-simetriaVertical <- function(m) {
-  simetria <- 0
-  for (i in 1:nrow(m)) {
-    for (j in 1:ncol(m)/2) {
-      offset <- abs(m[i,j] - m[i,ncol(m)-j])
-      simetria <- simetria + offset
-      # print(paste("Offset =",offset))
-      # print(paste("Simetria =",simetria))
-      # print(typeof(offset))
-      # print(typeof(simetria))
-    }
-  }
-  simetria <- 2*simetria
+simetriaVertical <- function(vector) {
+  simetria <- 2*sum(abs(vector[1:(length(vector)/2)] - vector[(length(vector)/2+1):length(vector)]))
   return(simetria)
 }
 
-# simetrias_1 <- lapply(numeros_1_matrix, simetriaVertical)
-# simetrias_5 <- lapply(numeros_5_matrix, simetriaVertical)
-simetriaVertical(numeros_1_matrix[[3]])
+simetrias_1 <- lapply(numeros_1_matrix,function(m) -sum(apply(m,1,simetriaVertical)) )
+simetrias_5 <- lapply(numeros_5_matrix,function(m) -sum(apply(m,1,simetriaVertical)) )
 ```
 
 ## Ejercicio 4
@@ -552,6 +540,43 @@ simetriaVertical(numeros_1_matrix[[3]])
 Ahora representamos en una nube de puntos la simetría y la media de la intensidad de los números.
 
 ```{r plotMediaSimetria}
-datos_1 <- data.frame(cbind(medias_1, simetrias_1))
+datos_1 <- data.frame(cbind(Medias = medias_1, Simetrias = simetrias_1, Etiqueta = 1))
+datos_5 <- data.frame(cbind(Medias = medias_5, Simetrias = simetrias_5, Etiqueta = -1))
+
+datos <- rbind(datos_1, datos_5)
+plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
+```
+
+## Ejercicio 5
+
+Aplicamos el algoritmo de regresión para obtener un clasificador lineal.
+
+```{r regresion}
+regres_lin <- function(datos, label) {
+  X <- cbind(1, matrix(as.numeric(datos), ncol = 2))
+  
+  X.svd <- svd(X)
+  
+  V <- X.svd$v
+  D <- X.svd$d
+  Di <- diag(ifelse(D>0.0001, 1/D, D))
+  
+  Xt.X.inv <- V %*% Di %*% t(V)
+  
+  pseudoinversa <- Xt.X.inv %*% t(X)
+  
+  w <- pseudoinversa %*% as.numeric(label)
+  
+  return(c(-w[1]/w[3], -w[2]/w[3]))
+}
+```
+
+Una vez tenemos el algoritmo, lo probamos y dibujamos la recta.
+
+```{r pruebaRegresion}
+muestras <- cbind(datos$Medias, datos$Simetrias)
+etiquetas <- datos$Etiqueta
+recta <- regres_lin(muestras, etiquetas)
+abline(recta)
 ```
 
