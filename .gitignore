@@ -2,3 +2,4 @@
 .RData
 *.tex
 .Rproj.user
+*files/
