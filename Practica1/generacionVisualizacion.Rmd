@@ -553,7 +553,7 @@ Aplicamos el algoritmo de regresión para obtener un clasificador lineal.
 
 ```{r regresion}
 regres_lin <- function(datos, label) {
-  X <- cbind(1, matrix(as.numeric(datos), ncol = 2))
+  X <- cbind(1, matrix(as.numeric(datos), ncol = 1))
   
   X.svd <- svd(X)
   
@@ -561,21 +561,26 @@ regres_lin <- function(datos, label) {
   D <- X.svd$d
   Di <- diag(ifelse(D>0.0001, 1/D, D))
   
-  Xt.X.inv <- V %*% Di %*% t(V)
+  Xt.X.inv <- V %*% Di^2 %*% t(V)
   
   pseudoinversa <- Xt.X.inv %*% t(X)
   
   w <- pseudoinversa %*% as.numeric(label)
   
-  return(c(-w[1]/w[3], -w[2]/w[3]))
+  print(w)
+  
+  return(w)
+  # return(c(-w[1]/w[3], -w[2]/w[3]))
 }
 ```
 
 Una vez tenemos el algoritmo, lo probamos y dibujamos la recta.
 
 ```{r pruebaRegresion}
-muestras <- cbind(datos$Medias, datos$Simetrias)
-etiquetas <- datos$Etiqueta
+# muestras <- cbind(datos$Medias, datos$Simetrias)
+# etiquetas <- datos$Etiqueta
+muestras <- datos$Medias
+etiquetas <- datos$Simetrias
 recta <- regres_lin(muestras, etiquetas)
 abline(recta)
 ```
