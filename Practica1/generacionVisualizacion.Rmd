@@ -540,8 +540,8 @@ simetrias_5 <- lapply(numeros_5_matrix,function(m) -sum(apply(m,1,simetriaVertic
 Ahora representamos en una nube de puntos la simetría y la media de la intensidad de los números.
 
 ```{r plotMediaSimetria}
-datos_1 <- data.frame(cbind(Medias = medias_1, Simetrias = simetrias_1, Etiqueta = 1))
-datos_5 <- data.frame(cbind(Medias = medias_5, Simetrias = simetrias_5, Etiqueta = -1))
+datos_1 <- data.frame(Medias = as.numeric(medias_1), Simetrias = as.numeric(simetrias_1), Etiqueta = 1)
+datos_5 <- data.frame(Medias = as.numeric(medias_5), Simetrias = as.numeric(simetrias_5), Etiqueta = -1)
 
 datos <- rbind(datos_1, datos_5)
 plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
@@ -553,13 +553,20 @@ Aplicamos el algoritmo de regresión para obtener un clasificador lineal.
 
 ```{r regresion}
 regres_lin <- function(datos, label) {
-  X <- cbind(1, matrix(as.numeric(datos), ncol = 1))
   
+  if (is.null(ncol(datos)))
+    X <- cbind(1, as.numeric(datos))
+  else
+    X <- cbind(1, data.matrix(datos))
+  
+  print("HHHHH")
   X.svd <- svd(X)
-  
+  print("HOLI")
   V <- X.svd$v
   D <- X.svd$d
   Di <- diag(ifelse(D>0.0001, 1/D, D))
+  
+  
   
   Xt.X.inv <- V %*% Di^2 %*% t(V)
   
@@ -567,10 +574,12 @@ regres_lin <- function(datos, label) {
   
   w <- pseudoinversa %*% as.numeric(label)
   
-  print(w)
+  # print(w)
   
-  return(w)
-  # return(c(-w[1]/w[3], -w[2]/w[3]))
+  if (is.null(ncol(datos)))
+    return(w)
+  else
+    return(c(-w[1]/w[3], -w[2]/w[3]))
 }
 ```
 
@@ -579,11 +588,33 @@ regres_lin <- function(datos, label) {
 Una vez tenemos el algoritmo, lo probamos y dibujamos la recta.
 
 ```{r pruebaRegresion}
-# muestras <- cbind(datos$Medias, datos$Simetrias)
-# etiquetas <- datos$Etiqueta
-muestras <- datos$Medias
-etiquetas <- datos$Simetrias
+muestras <- cbind(datos$Medias, datos$Simetrias)
+etiquetas <- datos$Etiqueta
+# muestras <- datos$Medias
+# etiquetas <- datos$Simetrias
 recta <- regres_lin(muestras, etiquetas)
+plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
 abline(recta)
+```
+
+Valoración del resultado
+
+## Ejercicio 7
+
+Vamos a generar diversas muestras y ver cómo se comporta la regresión lineal en problemas de clasificación.
+
+### Apartado a)
+
+Aquí analizamos el error dentro de la muestra de nuestro clasificador.
+
+```{r Ein}
+intervalo <- -10:10
+muestras <- simula_unif(100, 2, intervalo)
+f <- simulaRecta(intervalo)
+etiquetas <- sign(muestras$Y - f[2]*muestras$X - f[1])
+g <- regres_lin(muestras,etiquetas)
+plot(muestras)
+abline(g)
+abline(f)
 ```
 
