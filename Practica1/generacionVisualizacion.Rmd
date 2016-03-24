@@ -485,6 +485,11 @@ print(resultado$Errores)
 \newpage
 
 # Regresión lineal
+```{r echo = FALSE, include = FALSE}
+# Borrar variables que NO son funciones
+rm(list = setdiff(ls(), lsf.str()))
+```
+
 
 ## Ejercicios 1 y 2
 
@@ -552,17 +557,16 @@ plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Int
 Aplicamos el algoritmo de regresión para obtener un clasificador lineal.
 
 ```{r regresion}
-regres_lin <- function(datos, label) {
+regres_lin <- function(datos, label, pesos = FALSE) {
   
   if (is.null(ncol(datos)))
     X <- cbind(1, as.numeric(datos))
   else
     X <- cbind(1, data.matrix(datos))
   
-  print("HHHHH")
   X.svd <- svd(X)
-  print("HOLI")
-  V <- X.svd$v
+
+    V <- X.svd$v
   D <- X.svd$d
   Di <- diag(ifelse(D>0.0001, 1/D, D))
   
@@ -574,9 +578,7 @@ regres_lin <- function(datos, label) {
   
   w <- pseudoinversa %*% as.numeric(label)
   
-  # print(w)
-  
-  if (is.null(ncol(datos)))
+  if (is.null(ncol(datos)) || pesos == TRUE)
     return(w)
   else
     return(c(-w[1]/w[3], -w[2]/w[3]))
@@ -588,16 +590,18 @@ regres_lin <- function(datos, label) {
 Una vez tenemos el algoritmo, lo probamos y dibujamos la recta.
 
 ```{r pruebaRegresion}
-muestras <- cbind(datos$Medias, datos$Simetrias)
-etiquetas <- datos$Etiqueta
-# muestras <- datos$Medias
-# etiquetas <- datos$Simetrias
+# muestras <- cbind(datos$Medias, datos$Simetrias)
+# etiquetas <- datos$Etiqueta
+muestras <- datos$Medias
+etiquetas <- datos$Simetrias
 recta <- regres_lin(muestras, etiquetas)
 plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
 abline(recta)
 ```
 
 Valoración del resultado
+
+\newpage
 
 ## Ejercicio 7
 
@@ -610,11 +614,71 @@ Aquí analizamos el error dentro de la muestra de nuestro clasificador.
 ```{r Ein}
 intervalo <- -10:10
 muestras <- simula_unif(100, 2, intervalo)
-f <- simulaRecta(intervalo)
-etiquetas <- sign(muestras$Y - f[2]*muestras$X - f[1])
-g <- regres_lin(muestras,etiquetas)
-plot(muestras)
-abline(g)
-abline(f)
+
+errores <- 0
+for (i in 1:1000) {
+  f <- simulaRecta(intervalo)
+  etiquetas <- sign(muestras$Y - f[2]*muestras$X - f[1])
+  g <- regres_lin(muestras,etiquetas)
+  etiquetas.regresion <- sign(muestras$Y - g[2]*muestras$X - g[1])
+  
+  errores <- errores + sum(etiquetas != etiquetas.regresion)/length(etiquetas)
+}
+errores <- errores / 1000
 ```
 
+El $E_{in}$ es `r I(errores)`, lo cual nos da una estimación de lo bueno que puede ser nuestro clasificador dentro de la muestra.
+
+### Apartado b)
+
+Veamos cómo se comporta el regresor lineal fuera de la muestra. 
+
+```{r Eout}
+intervalo <- -10:10
+muestras <- simula_unif(100, 2, intervalo)
+
+errores <- 0
+for (i in 1:1000) {
+  f <- simulaRecta(intervalo)
+  etiquetas <- sign(muestras$Y - f[2]*muestras$X - f[1])
+  g <- regres_lin(muestras,etiquetas)
+  
+  muestras.nuevas <- simula_unif(1000, 2, intervalo)
+  etiquetas.f <- sign(muestras.nuevas$Y - f[2]*muestras.nuevas$X - f[1])
+  etiquetas.g <- sign(muestras.nuevas$Y - g[2]*muestras.nuevas$X - g[1])
+  
+  errores <- errores + sum(etiquetas.f != etiquetas.g)/length(etiquetas.f)
+}
+errores <- errores / 1000
+```
+
+El $E_{out}$ es `r I(errores)`, lo cual nos da a entender que fuera de la muestra, también se comporta bien nuestro clasificador.
+
+\newpage
+### Apartado c)
+
+Ahora veamos cómo se comporta el _PLA_ cuando toma como vector inicial una recta de regresión.
+
+```{r RegresionPLA}
+intervalo <- -10:10
+muestras <- simula_unif(10, 2, intervalo)
+
+iteraciones <- 0
+iteraciones.cero <- 0
+for (i in 1:100) {
+  f <- simulaRecta(intervalo)
+  etiquetas <- sign(muestras$Y - f[2]*muestras$X - f[1])
+  w <- regres_lin(muestras,etiquetas, TRUE)
+  w.cero <- rep(0,3)
+  
+  resultado <- ajusta_PLA(muestras, etiquetas, 10000, w)
+  resultado.cero <- ajusta_PLA(muestras, etiquetas, 10000, w.cero)
+  
+  iteraciones <- iteraciones + resultado$Iteraciones
+  iteraciones.cero <- iteraciones.cero + resultado.cero$Iteraciones
+}
+iteraciones <- iteraciones / 100
+iteraciones.cero <- iteraciones.cero / 100
+```
+
+El número de iteraciones medio es `r I(iteraciones)`, y el de iteraciones con vector inicial 0 es `r I(iteraciones.cero)` con lo que vemos que con regresión podemos dar un vector inicial para el _PLA_ que hace que éste converga de manera más rápida.
