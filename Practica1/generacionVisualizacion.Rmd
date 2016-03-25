@@ -681,4 +681,38 @@ iteraciones <- iteraciones / 100
 iteraciones.cero <- iteraciones.cero / 100
 ```
 
-El número de iteraciones medio es `r I(iteraciones)`, y el de iteraciones con vector inicial 0 es `r I(iteraciones.cero)` con lo que vemos que con regresión podemos dar un vector inicial para el _PLA_ que hace que éste converga de manera más rápida.
+El número de iteraciones medio es `r I(iteraciones)`, y el de iteraciones con vector inicial 0 es `r I(iteraciones.cero)`, con lo que vemos que con regresión podemos dar un vector inicial para el _PLA_ que hace que éste converga de manera más rápida.
+
+\newpage
+## Ejercicio 8
+```{r echo = FALSE, include = FALSE}
+# Borrar variables que NO son funciones
+rm(list = setdiff(ls(), lsf.str()))
+```
+
+Estudiemos el uso de transformeaciones no lineales en el ámbito del Aprendizaje Automático. Generamos una muestra de 1000 puntos en $[-10,10] \times [-10,10]$ y meteremos ruido en un 10% de los datos.
+
+```{r noLinealMuestreo}
+f <- function(X,Y) { sign(X^2 + Y^2 - 0.6) }
+muestra <- simula_unif(1000, 2, c(-10,10))
+
+etiquetas <- apply(muestra,1, function(m) { do.call(f, as.list(m)) } )
+
+porcion <- 10
+numero.datos.ruido <- ceiling(nrow(muestra) * porcion / 100)
+
+
+ruido <- sample(c(rep(-1,numero.datos.ruido), 
+                                         rep(1, nrow(muestra) - numero.datos.ruido)))
+
+etiquetas.ruido <- etiquetas * ruido
+```
+
+```{r echo = FALSE}
+
+par(mfrow=c(1,2))
+plot(muestra, main = "Muestras originales", col = ifelse(etiquetas == 1, "red", "blue"))
+plot(muestra, main = "Muestras con ruido", col = ifelse(etiquetas.ruido == 1, "red", "blue"))
+```
+
+Ahora ajustaremos una regresión y veremos el error dentro de esta muestra.
