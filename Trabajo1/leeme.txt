@@ -1,0 +1,3 @@
+Ejecutar el archivo .R usando
+
+$ Rscript trabajo1.R
