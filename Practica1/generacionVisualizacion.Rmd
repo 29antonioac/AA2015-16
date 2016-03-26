@@ -5,6 +5,8 @@ output: pdf_document
 ---
 ```{r, include = FALSE}
 library(knitr)
+rm(list = ls())
+par(mfrow=c(1,1))
 opts_chunk$set(tidy.opts=list(width.cutoff=70))
 set.seed(123456)
 ```
@@ -71,16 +73,20 @@ plot(muestra.gaussiana, main = "Distribución normal", xlab = "", ylab = "")
 \newpage
 ## Ejercicio 5
 
-Ahora escribimos una pequeña función para calular una recta dados dos puntos. Daremos la recta con la ecuación punto pendiente, por lo que tenemos que calcular la pendiente y la desviación.
+Ahora escribimos una pequeña función para calular una recta aleatoria dado un intervalo. Daremos la recta con la ecuación punto pendiente, por lo que tenemos que calcular la pendiente y la desviación.
 
 ```{r calculaRecta}
 simulaRecta <- function(intervalo){
   A <- runif(2, intervalo[1], intervalo[length(intervalo)])
   B <- runif(2, intervalo[1], intervalo[length(intervalo)])
   
+  # La pendiente m es el cociente de las diferencias de las componentes
   m <- (A[2] - B[2]) / (A[1] - B[1])
+  
+  # La traslación b la sacamos despejando de y = ax + b
   b <- A[2] - m * A[1]
   
+  # Lo devolvemos en este orden para ser consistentes con abline
   return(c(b,m))
 }
 
@@ -92,7 +98,7 @@ Generamos una recta aleatoria en $[-50,50]$
 ```{r simulaRecta}
 rectaPrueba <- simulaRecta(-50:50)
 
-plot(1, type="n", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
+plot(1, type="n",main="Recta de prueba", xlab="", ylab="", xlim=c(-50, 50), ylim=c(-50, 50))
 abline(coef = rectaPrueba)
 ```
 
@@ -194,7 +200,7 @@ points(subset(muestra.uniforme, f(X,Y) <= 0 ),
 
 ```
 
-Añadir aquí conclusiones de las regiones nuevas comparadas con la lineal.
+Parece que las regiones no lineales no serán tan fáciles de predecir como las lineales. Un algoritmo sencillo como el _PLA_ no podrá separar estos datos.
 
 \newpage
 ## Ejercicio 8
@@ -208,21 +214,24 @@ porcion <- 10
 numero.datos.positivos <- ceiling(nrow(muestra.uniforme.positiva) * porcion / 100)
 numero.datos.negativos <- ceiling(nrow(muestra.uniforme.negativa) * porcion / 100)
 
-
+# Generamos vectores de booleanos
 vector.aleatorio.muestras.positivas <- c(rep(FALSE,numero.datos.positivos), 
                                          rep(TRUE, nrow(muestra.uniforme.positiva) - numero.datos.positivos))
 
 vector.aleatorio.muestras.negativas <- c(rep(FALSE,numero.datos.negativos), 
                                          rep(TRUE, nrow(muestra.uniforme.negativa) - numero.datos.negativos))
 
+# Los reordenamos
 vector.aleatorio.muestras.positivas <- sample(vector.aleatorio.muestras.positivas)
 vector.aleatorio.muestras.negativas <- sample(vector.aleatorio.muestras.negativas)
 
+# Separamos
 muestra.uniforme.positiva.nueva <- 
   muestra.uniforme.positiva[vector.aleatorio.muestras.positivas,]
 muestra.uniforme.negativa.nueva <- 
   muestra.uniforme.negativa[vector.aleatorio.muestras.negativas,]
 
+# Volvemos a unir
 muestra.uniforme.positiva.nueva <- rbind(muestra.uniforme.positiva.nueva,
                                        muestra.uniforme.negativa[!vector.aleatorio.muestras.negativas,])
 
@@ -231,7 +240,6 @@ muestra.uniforme.negativa.nueva <- rbind(muestra.uniforme.negativa.nueva,
 
 muestra.uniforme.positiva.nueva$Etiqueta <-  1
 muestra.uniforme.negativa.nueva$Etiqueta <- -1
-
 ```
 
 Ahora mostramos los nuevos resultados
@@ -246,6 +254,9 @@ points(muestra.uniforme.negativa.nueva, pch = "-", col = "blue")
 abline(coef = rectaClasificacion)
 
 ```
+
+Al haber cambiado las etiquetas, los nuevos datos no son linealmente separables, luego el _PLA_ no convergerá.
+
 
 # Ajuste del algoritmo Perceptron (PLA)
 
@@ -496,7 +507,7 @@ rm(list = setdiff(ls(), lsf.str()))
 Leeremos los números desde el fichero de entrenamiento y guardaremos las instancias de 1's y 5's en sendas listas de matrices.
 
 ```{r leerZip}
-archivo  <- read.csv("zip.train", header = FALSE, sep = " ")
+archivo  <- read.csv("datos/zip.train", header = FALSE, sep = " ")
 colnames(archivo)[1] <- "ID"
 archivo["V258"] <- NULL
 
@@ -545,20 +556,25 @@ simetrias_5 <- lapply(numeros_5_matrix,function(m) -sum(apply(m,1,simetriaVertic
 Ahora representamos en una nube de puntos la simetría y la media de la intensidad de los números.
 
 ```{r plotMediaSimetria}
-datos_1 <- data.frame(Medias = as.numeric(medias_1), Simetrias = as.numeric(simetrias_1), Etiqueta = 1)
-datos_5 <- data.frame(Medias = as.numeric(medias_5), Simetrias = as.numeric(simetrias_5), Etiqueta = -1)
+datos_1 <- data.frame(Medias = as.numeric(medias_1), Simetrias = as.numeric(simetrias_1), 
+                      Etiqueta = 1)
+datos_5 <- data.frame(Medias = as.numeric(medias_5), Simetrias = as.numeric(simetrias_5), 
+                      Etiqueta = -1)
 
 datos <- rbind(datos_1, datos_5)
-plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
+plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", 
+     xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
 ```
 
 ## Ejercicio 5
 
-Aplicamos el algoritmo de regresión para obtener un clasificador lineal.
+Aplicamos el algoritmo de regresión explicado en clase para obtener un clasificador lineal.
 
 ```{r regresion}
 regres_lin <- function(datos, label, pesos = FALSE) {
   
+  # Si no hay columnas es porque le hemos pasado un vector para hacer regresión
+  # Si hay columnas es porque queremos hacer un clasificador
   if (is.null(ncol(datos)))
     X <- cbind(1, as.numeric(datos))
   else
@@ -566,11 +582,9 @@ regres_lin <- function(datos, label, pesos = FALSE) {
   
   X.svd <- svd(X)
 
-    V <- X.svd$v
+  V <- X.svd$v
   D <- X.svd$d
   Di <- diag(ifelse(D>0.0001, 1/D, D))
-  
-  
   
   Xt.X.inv <- V %*% Di^2 %*% t(V)
   
@@ -578,7 +592,9 @@ regres_lin <- function(datos, label, pesos = FALSE) {
   
   w <- pseudoinversa %*% as.numeric(label)
   
-  if (is.null(ncol(datos)) || pesos == TRUE)
+  # Si es regresión o el vector de pesos es distinto a 3, se devuelve el vector
+  # Si no, se devuelve la recta asociada
+  if (is.null(ncol(datos)) || length(w) != 3 || pesos == TRUE)
     return(w)
   else
     return(c(-w[1]/w[3], -w[2]/w[3]))
@@ -587,19 +603,23 @@ regres_lin <- function(datos, label, pesos = FALSE) {
 
 ## Ejercicio 6
 
-Una vez tenemos el algoritmo, lo probamos y dibujamos la recta.
+Una vez tenemos el algoritmo, lo probamos. Se dibujan dos rectas: una azul y una roja. La azul se corresponde con la recta de regresión de la simetría con respecto a la intensidad. La roja es un clasificador con regresión, que ajusta el par (intensidad, simetría) a la etiqueta de los datos.
 
 ```{r pruebaRegresion}
-# muestras <- cbind(datos$Medias, datos$Simetrias)
-# etiquetas <- datos$Etiqueta
-muestras <- datos$Medias
-etiquetas <- datos$Simetrias
-recta <- regres_lin(muestras, etiquetas)
+muestras.clasificacion <- cbind(datos$Medias, datos$Simetrias)
+etiquetas.clasificacion <- datos$Etiqueta
+muestras.regresion <- datos$Medias
+etiquetas.regresion <- datos$Simetrias
+recta.clasificacion <- regres_lin(muestras.clasificacion, etiquetas.clasificacion)
+recta.regresion <- regres_lin(muestras.regresion, etiquetas.regresion)
+
 plot(datos$Medias, datos$Simetrias, main = "Intensidad y Simetría", xlab = "Intensidad", ylab = "Simetría Vertical", col = as.numeric(datos$Etiqueta) + 2)
-abline(recta)
+
+abline(recta.clasificacion, col = "red")
+abline(recta.regresion, col = "blue")
 ```
 
-Valoración del resultado
+El clasificador se comporta bastante bien dentro de la muestra, ya que sólo se deja algunos outliers. El regresor no se comporta igual, ya que como los datos no forman una recta, quedan muchísimos datos fuera.
 
 \newpage
 
@@ -627,13 +647,13 @@ for (i in 1:1000) {
 errores <- errores / 1000
 ```
 
-El $E_{in}$ es `r I(errores)`, lo cual nos da una estimación de lo bueno que puede ser nuestro clasificador dentro de la muestra.
+El $E_{in}$ es `r I(errores*100)`%, lo cual nos da una estimación de lo bueno que puede ser nuestro clasificador dentro de la muestra.
 
 ### Apartado b)
 
 Veamos cómo se comporta el regresor lineal fuera de la muestra. 
 
-```{r Eout}
+```{r Eout, eval = TRUE}
 intervalo <- -10:10
 muestras <- simula_unif(100, 2, intervalo)
 
@@ -652,7 +672,7 @@ for (i in 1:1000) {
 errores <- errores / 1000
 ```
 
-El $E_{out}$ es `r I(errores)`, lo cual nos da a entender que fuera de la muestra, también se comporta bien nuestro clasificador.
+El $E_{out}$ es `r I(errores*100)`%, lo cual nos da a entender que fuera de la muestra, también se comporta bien nuestro clasificador.
 
 \newpage
 ### Apartado c)
@@ -694,25 +714,66 @@ Estudiemos el uso de transformeaciones no lineales en el ámbito del Aprendizaje
 
 ```{r noLinealMuestreo}
 f <- function(X,Y) { sign(X^2 + Y^2 - 0.6) }
-muestra <- simula_unif(1000, 2, c(-10,10))
+muestras <- simula_unif(1000, 2, c(-10,10))
 
-etiquetas <- apply(muestra,1, function(m) { do.call(f, as.list(m)) } )
+etiquetas <- apply(muestras,1, function(m) { do.call(f, as.list(m)) } )
 
 porcion <- 10
-numero.datos.ruido <- ceiling(nrow(muestra) * porcion / 100)
+numero.datos.ruido <- ceiling(nrow(muestras) * porcion / 100)
+Ein <- 0
 
+for (i in 1:1000) {
+  ruido <- sample(c(rep(-1,numero.datos.ruido), 
+                                           rep(1, nrow(muestras) - numero.datos.ruido)))
+  etiquetas.ruido <- etiquetas * ruido
+  
+  g <- regres_lin(muestras,etiquetas)
+  etiquetas.g <- sign(muestras$Y - g[2]*muestras$X - g[1])
+  
+  Ein <- Ein + sum(etiquetas.ruido != etiquetas.g)/length(etiquetas.ruido)
+}
 
-ruido <- sample(c(rep(-1,numero.datos.ruido), 
-                                         rep(1, nrow(muestra) - numero.datos.ruido)))
-
-etiquetas.ruido <- etiquetas * ruido
+Ein <- Ein / 1000
 ```
 
-```{r echo = FALSE}
+El $E_{in}$ es `r I(Ein*100)`%, lo cual es nos dice que más del 10% de los datos (los de ruido y algunos más) han sido mal clasificados. Por tanto esta solución no es buena. Vamos a aplicar una transformación a ver que ocurre. Analizaremos el error fuera de la muestra de la regresión utilizando el vector $(1,x_1, x_2, x_1x_2, x_1^2, x_2^2)$.
 
-par(mfrow=c(1,2))
-plot(muestra, main = "Muestras originales", col = ifelse(etiquetas == 1, "red", "blue"))
-plot(muestra, main = "Muestras con ruido", col = ifelse(etiquetas.ruido == 1, "red", "blue"))
+```{r RegresionTransformada}
+muestras.transformadas <- data.frame(X0 = 1, X1 = muestras$X, X2 = muestras$Y,
+                                     X1X2 = muestras$X * muestras$Y, 
+                                     X1_2 = (muestras$X)^2,
+                                     X2_2 = (muestras$Y)^2 )
+
+regresion.transformada <- regres_lin(muestras.transformadas[,-1], etiquetas.ruido)
+print(regresion.transformada)
 ```
 
-Ahora ajustaremos una regresión y veremos el error dentro de esta muestra.
+\newpage
+Una vez tenemos un vector de pesos para este problema, vamos a analizar el error fuera de la muestra, a ver cómo se comporta el regresor con esta transformación.
+
+```{r EoutRegresionTransformada, eval = TRUE}
+Eout <- 0
+
+for (i in 1:1000) {
+  muestras.fuera <- simula_unif(1000, 2, c(-10,10))
+  muestras.transformadas.fuera <- data.frame(X0 = 1, X1 = muestras.fuera$X, 
+                                     X2 = muestras.fuera$Y,
+                                     X1X2 = muestras.fuera$X * muestras.fuera$Y, 
+                                     X1_2 = (muestras.fuera$X)^2,
+                                     X2_2 = (muestras.fuera$Y)^2 )
+  
+  
+  etiquetas.buenas <- apply(muestras.fuera, 1, function(m) { do.call(f, as.list(m)) } )
+  pesos.transformada <- regres_lin(muestras.transformadas[,-1], etiquetas.ruido)
+  etiquetas.fuera <- apply(muestras.transformadas.fuera, 1, function(m) { 
+                                                              sign(sum(pesos.transformada * m)) 
+                                                            } )
+  
+  Eout <- Eout + sum(etiquetas.buenas != etiquetas.fuera)/length(etiquetas.buenas)
+  
+}
+
+Eout <- Eout / 1000
+```
+
+En este caso el Eout es `r I(Eout*100)`%. La transformación parece que ha servido puesto fuera de la muestra el clasificador se muestra bastante fiable: ni un 1% de errores.
