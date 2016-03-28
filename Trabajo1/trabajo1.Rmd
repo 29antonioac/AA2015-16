@@ -713,7 +713,7 @@ rm(list = setdiff(ls(), lsf.str()))
 Estudiemos el uso de transformeaciones no lineales en el ámbito del Aprendizaje Automático. Generamos una muestra de 1000 puntos en $[-10,10] \times [-10,10]$ y meteremos ruido en un 10% de los datos.
 
 ```{r noLinealMuestreo}
-f <- function(X,Y) { sign(X^2 + Y^2 - 0.6) }
+f <- function(X,Y) { sign(X^2 + Y^2 - 25) }
 muestras <- simula_unif(1000, 2, c(-10,10))
 
 etiquetas <- apply(muestras,1, function(m) { do.call(f, as.list(m)) } )
@@ -776,4 +776,4 @@ for (i in 1:1000) {
 Eout <- Eout / 1000
 ```
 
-En este caso el Eout es `r I(Eout*100)`%. La transformación parece que ha servido puesto fuera de la muestra el clasificador se muestra bastante fiable: ni un 1% de errores.
+En este caso el Eout es `r I(Eout*100)`%. La transformación parece que ha servido puesto fuera de la muestra el clasificador se muestra bastante fiable.

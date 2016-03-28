@@ -612,7 +612,7 @@ invisible(readLines("stdin", n=1))
 rm(list = setdiff(ls(), lsf.str()))
 
 ## ----noLinealMuestreo----------------------------------------------------
-f <- function(X,Y) { sign(X^2 + Y^2 - 0.6) }
+f <- function(X,Y) { sign(X^2 + Y^2 - 25) }
 muestras <- simula_unif(1000, 2, c(-10,10))
 
 etiquetas <- apply(muestras,1, function(m) { do.call(f, as.list(m)) } )
