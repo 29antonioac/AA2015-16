@@ -1,0 +1,285 @@
+\documentclass[a4paper, 11pt]{article}
+
+%Comandos para configurar el idioma
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} %Necesario para el uso de las comillas latinas.
+\usepackage{geometry} % Used to adjust the document margins
+
+%Importante que esta sea la última órden del preámbulo
+\usepackage{hyperref}
+   \hypersetup{
+     pdftitle={Cuestionario de teoría 3},
+     pdfauthor={Antonio Álvarez Caballero},
+     unicode,
+     breaklinks=true,  % so long urls are correctly broken across lines
+     colorlinks=true,
+     urlcolor=blue,
+     linkcolor=darkorange,
+     citecolor=darkgreen,
+     }
+
+   % Slightly bigger margins than the latex defaults
+
+   \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\newcommand\fnurl[2]{%
+  \href{#2}{#1}\footnote{\url{#2}}%
+}
+
+
+%Paquetes matemáticos
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage[all]{xy} %Para diagramas
+\usepackage{enumerate} %Personalización de enumeraciones
+\usepackage{tikz} %Dibujos
+\usepackage{ dsfont }
+
+%Tipografía escalable
+\usepackage{lmodern}
+%Legibilidad
+\usepackage{microtype}
+
+%Código
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=R,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{Cuestionario de teoría 1}
+\author{Antonio Álvarez Caballero\\
+    \href{mailto:analca3@correo.ugr.es}{analca3@correo.ugr.es}}
+\date{\today}
+
+\theoremstyle{definition}
+\newtheorem{ejercicio}{Ejercicio}
+\newtheorem{cuestion}{Cuestión}
+\newtheorem*{solucion}{Solución}
+\newtheorem*{bonus}{BONUS}
+
+
+
+%%%%%%%% New sqrt
+\usepackage{letltxmacro}
+\makeatletter
+\let\oldr@@t\r@@t
+\def\r@@t#1#2{%
+\setbox0=\hbox{$\oldr@@t#1{#2\,}$}\dimen0=\ht0
+\advance\dimen0-0.2\ht0
+\setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+{\box0\lower0.4pt\box2}}
+\LetLtxMacro{\oldsqrt}{\sqrt}
+\renewcommand*{\sqrt}[2][\ ]{\oldsqrt[#1]{#2} }
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+  \maketitle
+
+  \section{Cuestiones}
+
+  \begin{cuestion}
+    Identificar, para cada una de las siguiente tareas, qué tipo de aprendizaje automático es el adecuado (supervisado, no supervisado, por refuerzo) y los datos de aprendizaje que deberíamos usar. Si una tarea se ajusta a más de un tipo, explicar cómo y describir los datos para cada tipo.
+    \begin{enumerate}
+      \item[a)] Categorizar un grupo de animales vertebrados en pájaros, mamíferos, reptiles, aves y anfibios.
+      \item[b)] Clasificación automática de cartas por distrito postal.
+      \item[c)] Decidir si un determinado índice del mercado de valores subirá o bajará dentro de un periodo de tiempo fijado.
+    \end{enumerate}
+
+  \end{cuestion}
+
+  \begin{solucion}
+    \begin{enumerate}
+      \item[a)] Aprendizaje supervisado. Lo importante aquí es el conjunto de datos, ya que cada uno de estas clases tiene características bastante bien definidas.
+      \item[b)] Aprendizaje no supervisado. Aquí no hace falta que se sepa realmente la etiqueta de los datos, simplemente con que el sistema sea capaz de juntar las cartas que
+      \item[c)] Decidir si un determinado índice del mercado de valores subirá o bajará dentro de un periodo de tiempo fijado.
+    \end{enumerate}
+  \end{solucion}
+
+  \begin{cuestion}
+  ¿Cuáles de los siguientes problemas son más adecuados para una aproximación por aprendizaje y cuáles más adecuados para una aproximación por diseño? Justificar la decisión.
+  \begin{enumerate}
+  \item[a)] Determinar el ciclo óptimo para las luces de los semáforos en un cruce con mucho tráfico.
+  \item[b)] Determinar los ingresos medios de una persona a partir de sus datos de nivel de educación, edad, experiencia y estatus social.
+  \item[c)] Determinar si se debe aplicar una campaña de vacunación contra una enfermedad.
+  \end{enumerate}
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Construir un problema de \emph{aprendizaje desde datos} para un problema de selección de fruta en una explotación agraria (ver transparencias de clase). Identificar y describir cada uno de sus elementos formales. Justificar las decisiones.
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Suponga un modelo PLA y un dato $x(t)$ mal clasificado respecto de dicho modelo. Probar que la regla de adaptación de pesos del PLA es un movimiento en la dirección correcta para clasificar bien $x(t)$.\\
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Considere el enunciado del ejercicio 2 de la sección FACTIBILIDAD DEL APRENDIZAJE de la relación de apoyo.
+  \begin{enumerate}
+  \item[a)] Si $p=0,9$, ¿cuál es la probabilidad de que $S$ produzca una hipótesis mejor que $C$?
+  \item[b)] ¿Existe un valor de $p$ para el cual es más probable que $C$ produzca una hipótesis mejor que $S$?
+  \end{enumerate}
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  La desigualdad de Hoeffding modificada nos da una forma de caracterizar el error de generalización con una cota probabilística
+  \[
+  \mathds{P}[|E_{out}(g) - E_{in}(g)| > \epsilon] \leq 2Me^{-2N^2 \epsilon}
+  \]
+  para cualquier $\epsilon > 0$. Si fijamos $\epsilon=0,05$ y queremos que la cota probabilística $2Me^{-2N^2 \epsilon}$ sea como máximo $0,03$, ¿cuál será el valor más pequeño de $N$ que verifique estas condiciones si $M=1$? Repetir para $M=10$ y para $M=100$.
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Consideremos el modelo de aprendizaje \emph{M-intervalos} donde $h: \mathbb{R} \rightarrow {-1, +1}$ y $h(x)=+1$ si el punto está dentro de cualquiera de $m$ intervalos arbitrariamente elegidos y $-1$ en otro caso. ¿Cuál es el más pequeño punto de ruptura para este conjunto de hipótesis?
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Suponga un conjunto de $k^*$ puntos $x_1,x_2,...,x_{k^*}$ sobre los cuales la clase $H$ implementa $<2^{k^*}$ dicotomías. ¿Cuáles de las siguientes afirmaciones son correctas?
+  \begin{enumerate}
+  \item[a)] $k^*$ es un punto de ruptura
+  \item[b)] $k^*$ no es un punto de ruptura
+  \item[c)] todos los puntos de ruptura son estrictamente mayores que $k^*$
+  \item[d)] todos los puntos de ruptura son menores o iguales a $k^*$
+  \item[e)] no conocemos nada acerca del punto de ruptura
+  \end{enumerate}
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Para todo conjunto de $k^*$ puntos, $H$ implementa $<2^{k^*}$ dicotomías. ¿Cuáles de las siguientes afirmaciones son correctas?
+  \begin{enumerate}
+  \item[a)] $k^*$ es un punto de ruptura
+  \item[b)] $k^*$ no es un punto de ruptura
+  \item[c)] todos los $k \geq k^*$ son puntos de ruptura
+  \item[d)] todos los $k < k^*$ son puntos de ruptura
+  \item[e)] no conocemos nada acerca del punto de ruptura
+  \end{enumerate}
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Si queremos mostrar que $k^*$ es un punto de ruptura, ¿cuáles de las siguientes afirmaciones nos servirían para ello?:
+  \begin{enumerate}
+  \item[a)] Mostrar que existe un conjunto de $k^*$ puntos $x_1,\cdots,x_{k^*}$ que $H$ puede separar (\emph{shatter}).
+  \item[b)] Mostrar que $H$ puede separar cualquier conjunto de $k^*$ puntos.
+  \item[c)] Mostrar un conjunto de $k^*$ puntos $x_1,\cdots,x_{k^*}$ que $H$ no puede separar.
+  \item[d)] Mostrar que $H$ no puede separar ningún conjunto de $k^*$ puntos.
+  \item[e)] Mostrar que $m_H(k)=2^{k^*}$
+  \end{enumerate}
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Para un conjunto $H$ con $d_{VC}=10$, ¿qué tamaño muestral se necesita (según la cota de generalización) para tener un $95\%$ de confianza de que el error de generalización sea como mucho $0,05$?
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{cuestion}
+  Consideremos un escenario de aprendizaje simple. Supongamos que la dimensión de entrada es uno. Supongamos que la variable de entrada $x$ está uniformemente distribuida en el intervalo $[-1,1]$ y el conjunto de datos consiste en 2 puntos ${x_1,x_2}$ y que la función objetivo es $f(x)=x^2$. Por tanto el conjunto de datos completo es $\mathcal{D}={(x_1,x_1^2), (x_2,x_2^2)}$. El algoritmo de aprendizaje devuelve la línea que ajusta estos dos puntos como $g$ (i.e. $H$ consiste en funciones de la forma $h(x)=ax+b$).
+  \begin{enumerate}
+  \item[a)] Dar una expresión analítica para la función promedio $\overline{g}(x)$.
+  \item[b)] Calcular analíticamente los valores de $E_{out}$, \emph{bias} y \emph{var}.
+  \end{enumerate}
+
+  \end{cuestion}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  %%%% BONUS %%%%
+
+  \begin{bonus}
+    Considere el enunciado del ejercicio 2 de la sección ERROR Y RUIDO de la relación de apoyo.
+    \begin{itemize}
+      \item[a)] Si su algoritmo busca la hipótesis $h$ que minimiza la suma de los valores absolutos de los errores de la muestra,
+
+      \[
+      E_{in}(h) = sum_{n=1}^N{|h-y_n|}
+      \]
+      entonces mostrar que la estimación será la mediana de la muestra, $h_{med}$ (cualquier valor que deje la mitad de la muestra a su derecha y la mitad a su izquierda)
+
+      \item[b)] Suponga que $y_n$ es modificado como $y_n + \epsilon$, donde $\epsilon \rightarrow \infty$. Obviamente el valor de $y_n$ se convierte en un punto muy alejado de su valor original. ¿Cómo afecta esto a los estimadores dados por $h_mean$ y $h_med$?
+    \end{itemize}
+  \end{bonus}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+  \begin{bonus}
+    Considere el ejercicio 12.
+    \begin{itemize}
+      \item[a)] Describir un experimento que podamos ejecutar para determinar (numéricamente) $g(x)$, $E_{out}$, \emph{bias} y \emph{var}.
+
+      \item[b)] Ejecutar el experimento y dar los resultados. Comparar $E_{out}$ con \emph{bias+var}. Dibujar en unos mismos ejes $g(x)$, $E_{out}$ y $f(x)$.
+    \end{itemize}
+  \end{bonus}
+
+  \begin{solucion}
+
+  \end{solucion}
+
+\end{document}
