@@ -9,7 +9,7 @@
 %Importante que esta sea la última órden del preámbulo
 \usepackage{hyperref}
    \hypersetup{
-     pdftitle={Cuestionario de teoría 3},
+     pdftitle={Cuestionario de teoría 1},
      pdfauthor={Antonio Álvarez Caballero},
      unicode,
      breaklinks=true,  % so long urls are correctly broken across lines
@@ -96,6 +96,11 @@
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 %%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%% Ceil
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{document}
 
   \maketitle
@@ -176,8 +181,25 @@
   \begin{solucion}
     Las soluciones son:
     \begin{enumerate}
-    \item[a)] Si $p=0,9$, ¿cuál es la probabilidad de que $S$ produzca una hipótesis mejor que $C$?
-    \item[b)] p < 0.5
+      \item[a)] Queremos determinar cuál es la probabilidad de que el error fuera de la muestra sea menor para $S$ que para $C$:
+        \begin{equation}
+          \begin{split}
+            P\left[E_{out}(S(\mathcal{D})) < E_{out}(C(\mathcal{D}))  \right] &=           P\left[E_{out}(h_1) < E_{out}(h_2)  \right] \\
+            &= P\left[P\left[f(x) \neq h_1\right] < P\left[f(x) \neq h_2\right]  \right] \\
+            &= P\left[P\left[f(x) = -1\right] < P\left[f(x) =+1\right]  \right] \\
+            &= P\left[1-p < p \right] = P\left[0.1 < 0.9 \right] = 1
+          \end{split}
+        \end{equation}
+      \item[b)] En este caso  razonamos igual que en el anterior, pero dándole la vuelta a la desigualdad y sin determinar $p$:
+      \begin{equation}
+        \begin{split}
+          P\left[E_{out}(S(\mathcal{D})) > E_{out}(C(\mathcal{D}))  \right] &=           P\left[E_{out}(h_1) > E_{out}(h_2)  \right] \\
+          &= P\left[P\left[f(x) \neq h_1\right] > P\left[f(x) \neq h_2\right]  \right] \\
+          &= P\left[P\left[f(x) = -1\right] > P\left[f(x) =+1\right]  \right] \\
+          &= P\left[1-p > p \right] = P\left[ 0.5 > p \right] = 1
+        \end{split}
+      \end{equation}
+      Es claro que dicha probabilidad es $1$ si y solamente si $p < 0.5$
     \end{enumerate}
   \end{solucion}
 
@@ -191,11 +213,34 @@
   \end{cuestion}
 
   \begin{solucion}
+    Sólo tenemos que despejar $N$ de la ecuación para conseguir los valores deseados. Como queremos que la cota sea $0.03$, igualamos y despejamos:
+
+      \[
+      2Me^{-2N\epsilon^2} = 0.03
+      \]
+
+      \[
+      e^{-2N\epsilon^2} = \frac{0.015}{M}
+      \]
+
+      \[
+      -2N\epsilon^2 = log\left(\frac{0.015}{M}\right)
+      \]
+
+      \[
+      N = \ceil{-log\left(\frac{0.015}{M}\right) \frac{1}{2\epsilon^2}}
+      \]
+
+      Ahora sólo tenemos que introducir $\epsilon = 0.05$ y los distintos valores de $M$.
+
+      $$M =  1 \rightarrow N =  840$$
+      $$M =  100 \rightarrow N =  1761$$
+      $$M =  1000 \rightarrow N =  2222$$
 
   \end{solucion}
 
   \begin{cuestion}
-  Consideremos el modelo de aprendizaje \emph{M-intervalos} donde $h: \mathbb{R} \rightarrow {-1, +1}$ y $h(x)=+1$ si el punto está dentro de cualquiera de $m$ intervalos arbitrariamente elegidos y $-1$ en otro caso. ¿Cuál es el más pequeño punto de ruptura para este conjunto de hipótesis?
+  Consideremos el modelo de aprendizaje \emph{M-intervalos} donde $h: \mathbb{R} \rightarrow \{-1, +1\}$ y $h(x)=+1$ si el punto está dentro de cualquiera de $m$ intervalos arbitrariamente elegidos y $h(x)=-1$ en otro caso. ¿Cuál es el más pequeño punto de ruptura para este conjunto de hipótesis?
 
   \end{cuestion}
 
