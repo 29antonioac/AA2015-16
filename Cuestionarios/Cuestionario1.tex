@@ -92,6 +92,10 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%% Norm
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+%%%%%%%%%%%%%%%%%
+
 \begin{document}
 
   \maketitle
@@ -109,10 +113,11 @@
   \end{cuestion}
 
   \begin{solucion}
+    Los tipos de aprendizaje son:
     \begin{enumerate}
-      \item[a)] Aprendizaje supervisado. Lo importante aquí es el conjunto de datos, ya que cada uno de estas clases tiene características bastante bien definidas.
-      \item[b)] Aprendizaje no supervisado. Aquí no hace falta que se sepa realmente la etiqueta de los datos, simplemente con que el sistema sea capaz de juntar las cartas que
-      \item[c)] Decidir si un determinado índice del mercado de valores subirá o bajará dentro de un periodo de tiempo fijado.
+      \item[a)] Aprendizaje supervisado. Lo importante aquí es el conjunto de datos, ya que cada uno de estas clases tiene características bastante bien definidas (pelo, plumas, número de patas, número de alas, piel seca o húmeda, escamas, órganos respiratorios, \ldots). Por esta misma razón estaría bien intentar realizar una aproximación por diseño.
+      \item[b)] Aprendizaje no supervisado. Aquí no hace falta que se sepa realmente la etiqueta de los datos, simplemente con que el sistema sea capaz de juntar las cartas que pertenezcan al mismo distrito postal
+      \item[c)] Por refuerzo. No siempre podemos basarnos en datos que ya tenemos para decidir esto (los datos de hace 4 años no tienen por qué ser relevantes ahora), por lo que una aproximación por refuerzo irá aprendiendo sobre la marcha con la actividad actual del mercado de valores.
     \end{enumerate}
   \end{solucion}
 
@@ -127,7 +132,12 @@
   \end{cuestion}
 
   \begin{solucion}
-
+    Las aproximaciones son:
+    \begin{enumerate}
+      \item[a)] Aproximación por diseño. Este es un problema que puede llegar a ser crítico si se produce algún fallo, luego una aproximación por diseño (exhaustivo) dará mejor resultado en una primera instancia que una aproximación por aprendizaje.
+      \item[b)] Aproximación por diseño
+      \item[c)] ¿?
+    \end{enumerate}
   \end{solucion}
 
   \begin{cuestion}
@@ -139,12 +149,20 @@
   \end{solucion}
 
   \begin{cuestion}
-  Suponga un modelo PLA y un dato $x(t)$ mal clasificado respecto de dicho modelo. Probar que la regla de adaptación de pesos del PLA es un movimiento en la dirección correcta para clasificar bien $x(t)$.\\
+  Suponga un modelo PLA y un dato $x(t)$ mal clasificado respecto de dicho modelo. Probar que la regla de adaptación de pesos del PLA es un movimiento en la dirección correcta para clasificar bien $x(t)$.
 
   \end{cuestion}
 
   \begin{solucion}
+    Definimos primero el término $y(t)w^T(t)x(t)$ como ,informalmente , el resultado de clasificar $x(t)$ con $w(t)$. Claramente es $>0$ si está bien clasificado y $<0$ si no lo está, ya que si está bien clasificado tenemos que $y(t) = sign(w^T(t)x(t))$, por lo cual su producto es positivo, y en caso contrario $y(t) \neq sign(w^T(t)x(t))$, lo cual su producto es negativo.
 
+    Usando esto, veamos que $y(t)w^T(t+1)x(t) > y(t)w^T(t)x(t)$. Es claro ya que      si expandimos el primer miembro con la regla de actualización del \emph{PLA} vemos que:
+
+    \[
+    y(t)w^T(t+1)x(t) = y(t){\big( w(t)+y(t)x(t) \big)}^T x(t) = y(t)w^T(t)x(t) + \underbrace{{\norm{x(t)}}^2}_{>0}
+    \]
+
+    Por lo cual la desigualdad de arriba queda clara. Con esto deducimos que la clasificación de $x(t)+1$ siempre será \emph{mejor} que la de $x(t)$, ya que el valor de su clasificación es mayor, lo cual hace que pueda superar a $0$, implicando que el dato estaría bien clasificado. Podría no superar a $0$, pero en tal caso estaría más cerca de estar bien clasificado.
   \end{solucion}
 
   \begin{cuestion}
@@ -162,7 +180,7 @@
   \begin{cuestion}
   La desigualdad de Hoeffding modificada nos da una forma de caracterizar el error de generalización con una cota probabilística
   \[
-  \mathds{P}[|E_{out}(g) - E_{in}(g)| > \epsilon] \leq 2Me^{-2N^2 \epsilon}
+  \mathds{P}[|E_{out}(g) - E_{in}(g)| > \epsilon] \leq 2Me^{-2N \epsilon^2}
   \]
   para cualquier $\epsilon > 0$. Si fijamos $\epsilon=0,05$ y queremos que la cota probabilística $2Me^{-2N^2 \epsilon}$ sea como máximo $0,03$, ¿cuál será el valor más pequeño de $N$ que verifique estas condiciones si $M=1$? Repetir para $M=10$ y para $M=100$.
 
@@ -215,9 +233,9 @@
   \begin{cuestion}
   Si queremos mostrar que $k^*$ es un punto de ruptura, ¿cuáles de las siguientes afirmaciones nos servirían para ello?:
   \begin{enumerate}
-  \item[a)] Mostrar que existe un conjunto de $k^*$ puntos $x_1,\cdots,x_{k^*}$ que $H$ puede separar (\emph{shatter}).
+  \item[a)] Mostrar que existe un conjunto de $k^*$ puntos $x_1,\ldots,x_{k^*}$ que $H$ puede separar (\emph{shatter}).
   \item[b)] Mostrar que $H$ puede separar cualquier conjunto de $k^*$ puntos.
-  \item[c)] Mostrar un conjunto de $k^*$ puntos $x_1,\cdots,x_{k^*}$ que $H$ no puede separar.
+  \item[c)] Mostrar un conjunto de $k^*$ puntos $x_1,\ldots,x_{k^*}$ que $H$ no puede separar.
   \item[d)] Mostrar que $H$ no puede separar ningún conjunto de $k^*$ puntos.
   \item[e)] Mostrar que $m_H(k)=2^{k^*}$
   \end{enumerate}
