@@ -48,7 +48,7 @@
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
 \lstset{frame=tb,
-  language=R,
+  language=Python,
   aboveskip=3mm,
   belowskip=3mm,
   showstringspaces=false,
@@ -159,7 +159,7 @@
   \end{cuestion}
 
   \begin{solucion}
-    Definimos primero el término $y(t)w^T(t)x(t)$ como ,informalmente , el resultado de clasificar $x(t)$ con $w(t)$. Claramente es $>0$ si está bien clasificado y $<0$ si no lo está, ya que si está bien clasificado tenemos que $y(t) = sign(w^T(t)x(t))$, por lo cual su producto es positivo, y en caso contrario $y(t) \neq sign(w^T(t)x(t))$, lo cual su producto es negativo.
+    Definimos primero el término $y(t)w^T(t)x(t)$ como, informalmente,  el resultado de clasificar $x(t)$ con $w(t)$. Claramente es $>0$ si está bien clasificado y $<0$ si no lo está, ya que si está bien clasificado tenemos que $y(t) = sign(w^T(t)x(t))$, por lo cual su producto es positivo, y en caso contrario $y(t) \neq sign(w^T(t)x(t))$, lo cual su producto es negativo.
 
     Usando esto, veamos que $y(t)w^T(t+1)x(t) > y(t)w^T(t)x(t)$. Es claro ya que      si expandimos el primer miembro con la regla de actualización del \emph{PLA} vemos que:
 
@@ -167,7 +167,7 @@
     y(t)w^T(t+1)x(t) = y(t){\big( w(t)+y(t)x(t) \big)}^T x(t) = y(t)w^T(t)x(t) + \underbrace{{\norm{x(t)}}^2}_{>0}
     \]
 
-    Por lo cual la desigualdad de arriba queda clara. Con esto deducimos que la clasificación de $x(t)+1$ siempre será \emph{mejor} que la de $x(t)$, ya que el valor de su clasificación es mayor, lo cual hace que pueda superar a $0$, implicando que el dato estaría bien clasificado. Podría no superar a $0$, pero en tal caso estaría más cerca de estar bien clasificado.
+    Por lo cual la desigualdad de arriba queda clara. Con esto deducimos que la clasificación de $x(t+1)$ siempre será \emph{mejor} que la de $x(t)$, ya que el valor de su clasificación es mayor, lo cual hace que pueda superar a $0$, implicando que el dato estaría bien clasificado. Podría no superar a $0$, pero en tal caso estaría más cerca de estar bien clasificado.
   \end{solucion}
 
   \begin{cuestion}
@@ -261,7 +261,7 @@
   \end{cuestion}
 
   \begin{solucion}
-
+    La respuesta correcta es la e). Para llegar a una conclusión tendría que ser \emph{para todo conjunto de} $k^*$ \emph{puntos}
   \end{solucion}
 
   \begin{cuestion}
@@ -276,7 +276,7 @@
   \end{cuestion}
 
   \begin{solucion}
-
+    Las respuestas correctas con a) y c). Como son todos los conjuntos, $2^{k^*}$ acota las dicotomías que implementa $H$. Además, cualquier valor mayor a dicho $k^*$ también lo acotará.
   \end{solucion}
 
   \begin{cuestion}
@@ -291,7 +291,7 @@
   \end{cuestion}
 
   \begin{solucion}
-
+    La solución es d). Si separara alguno, estaríamos en el caso de la cuestión 8. Si los separara todos, en el caso de la 9.
   \end{solucion}
 
   \begin{cuestion}
@@ -300,7 +300,11 @@
   \end{cuestion}
 
   \begin{solucion}
+    Tal y como se explica en las transparencias, se resolverá la cota del tamaño de la muestra iterativamente sobre la fórmula apropiada.
 
+    \lstinputlisting{complejidad.py}
+
+    El tamaño resultado de ejecutar este script es de 452957.
   \end{solucion}
 
   \begin{cuestion}
