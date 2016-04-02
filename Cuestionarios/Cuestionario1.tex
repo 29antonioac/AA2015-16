@@ -121,7 +121,7 @@
     Los tipos de aprendizaje son:
     \begin{enumerate}
       \item[a)] Aprendizaje supervisado. Lo importante aquí es el conjunto de datos, ya que cada uno de estas clases tiene características bastante bien definidas (pelo, plumas, número de patas, número de alas, piel seca o húmeda, escamas, órganos respiratorios, \ldots). Por esta misma razón estaría bien intentar realizar una aproximación por diseño, aunque habría que realizar primero un análisis de las variables y ver existe alguna pequeña superposición entre clases.
-      \item[b)] Aprendizaje no supervisado. Aquí no hace falta que se sepa realmente la etiqueta de los datos, simplemente con que el sistema sea capaz de agrupar las cartas que pertenezcan al mismo distrito postal.
+      \item[b)] Aprendizaje no supervisado. Aquí no hace falta que se sepa realmente la etiqueta de los datos, simplemente con que el sistema sea capaz de agrupar las cartas que pertenezcan al mismo distrito postal (que tengan el mismo número manuscrito).
       \item[c)] Por refuerzo. No siempre podemos basarnos en datos que ya tenemos para decidir esto (los datos de hace 4 años no tienen por qué ser relevantes ahora), por lo que una aproximación por refuerzo irá aprendiendo sobre la marcha con la actividad actual del mercado de valores.
     \end{enumerate}
   \end{solucion}
@@ -141,7 +141,7 @@
     \begin{enumerate}
       \item[a)] Aproximación por diseño. Este es un problema que puede llegar a ser crítico si se produce algún fallo, luego una aproximación por diseño (exhaustivo) dará mejor resultado en una primera instancia que una aproximación por aprendizaje.
       \item[b)] Aproximación por aprendizaje. Los ingresos medios de una persona no están directamente relacionados con los datos proporcionados, luego deberíamos intentar aprender de esos datos y realizar algún modelo que nos permita \emph{predecir} este dato de forma aceptable.
-      \item[c)] ¿?
+      \item[c)] Aproximación por aprendizaje. Se podría realizar aprendizaje sobre algún conjunto de datos que incluyera (por ejemplo) un factor de contagio de la enfermedad, probabilidad de secuelas críticas, etc... para, dada una enfermedad, poder decidir si es necesaria o no dicha campaña.
     \end{enumerate}
   \end{solucion}
 
@@ -241,6 +241,7 @@
       Ahora sólo tenemos que introducir $\epsilon = 0.05$ y los distintos valores de $M$.
 
       $$M =  1 \rightarrow N =  840$$
+      $$M =  10 \rightarrow N =  1301$$
       $$M =  100 \rightarrow N =  1761$$
       $$M =  1000 \rightarrow N =  2222$$
 
@@ -254,7 +255,9 @@
   \begin{solucion}
     El modelo de \emph{M-intervalos} es una generalización del modelo del \emph{intervalo}. Sabemos que para este modelo el punto de ruptura es $k = 3$. Veamos entonces si conseguimos alguna función lineal $aM + b; a,b \in \mathbb{N}$ que nos dé dicho valor de $k$ para el caso $M = 1$. Claramente los posibles valores son $a = 2 \bigwedge b = 1$ o $a = 1 \bigwedge b = 2$. Probamos con el primero, dándonos la función $2M+1$, viendo si el modelo es capaz de clasificar completamente $2M$ dicotomías y no puede con $2M+1$.
 
-    Meter prueba
+    Claramente el modelo puede separar correctamente un conjunto de $2M$ puntos. Supongamos que tenemos $M$ 1's y $M$ -1's. Recubriendo cada uno con un intervalo (sin alcanzar ningún $-1$) podemos clasificar cualquier dicotomía de este conjunto. Al haber separado un conjunto, podemos decir que NO es punto de ruptura.
+
+    Veamos para un conjunto con $2M+1$ puntos: la condición que necesitamos es que NO pueda clasificar todas las dicotomías de ningún conjunto. Es claro que no se puede: tomamos una dicotomía con $M$ -1's y $M+1$ 1's. Si estos puntos están alternados $(1,-1,1,\ldots,1,-1,1)$, no podemos clasficarlos con $M$ intervalos.
   \end{solucion}
 
   \begin{cuestion}
