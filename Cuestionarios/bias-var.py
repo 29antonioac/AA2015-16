@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import matplotlib.pyplot as plt
 import numpy as np
 from random import uniform
 from sympy import *
@@ -20,6 +21,9 @@ if __name__ == "__main__":
 
     # La funcion objetivo f es x^2
     f = x**2
+    def f_f(dato):
+        return f.subs(x,dato)
+    f_v = np.vectorize(f_f)
 
     # Determinamos g media como la media de K funciones g^(D)(x) con D aleatorio
     # La funcion g^(D)(x) esta definida en el ejercicio
@@ -36,6 +40,10 @@ if __name__ == "__main__":
     for dato in D:
         g_media += g_D.subs({a:dato[0],b:dato[1]})
     g_media /= num_datos
+
+    def g_media_f(dato):
+        return g_media.subs(x,dato)
+    g_media_v = np.vectorize(g_media_f)
 
     print("g_media(x) =",g_media)
 
@@ -96,10 +104,19 @@ if __name__ == "__main__":
     def eout_f(dato):
         return Eout_media.subs(x,dato)
     eout_v = np.vectorize(eout_f)
-    esp_eout = np.mean(eout_v(discretizacion))
+    eout_evaluado = eout_v(discretizacion)
+    esp_eout = np.mean(eout_evaluado)
 
     print("Eout con esperanza =",esp_eout, " Eout usando bias + var =", esp_bias+esp_varianza)
 
     fin = time()
 
     print("Tiempo transcurrido =", fin-inicio, "segundos")
+
+    plt.plot(discretizacion, g_media_v(discretizacion), color="blue",  linewidth=2.5, linestyle="-", label = "g_media")
+    plt.plot(discretizacion, f_v(discretizacion), color="red",  linewidth=2.5, linestyle="-", label = "f")
+    plt.plot(discretizacion, eout_evaluado, color="green",  linewidth=2.5, linestyle="-", label = "Eout")
+    plt.ylabel('Y')
+    plt.xlabel('X')
+    plt.legend(loc='upper left')
+    plt.show()
