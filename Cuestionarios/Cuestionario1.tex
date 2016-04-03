@@ -120,7 +120,7 @@
   \begin{solucion}
     Los tipos de aprendizaje son:
     \begin{enumerate}
-      \item[a)] Aprendizaje supervisado. Lo importante aquí es el conjunto de datos, ya que cada uno de estas clases tiene características bastante bien definidas (pelo, plumas, número de patas, número de alas, piel seca o húmeda, escamas, órganos respiratorios, \ldots). Por esta misma razón estaría bien intentar realizar una aproximación por diseño, aunque habría que realizar primero un análisis de las variables y ver existe alguna pequeña superposición entre clases.
+      \item[a)] Aprendizaje supervisado. Lo importante aquí es el conjunto de datos, ya que cada uno de estas clases tiene características bastante bien definidas (pelo, plumas, número de patas, número de alas, piel seca o húmeda, escamas, órganos respiratorios, \ldots). Como existe alguna pequeña superposición entre clases (un ornitorrinco es un mamífero que pone huevos, por ejemplo) sería difícil una aproximación por diseño.
       \item[b)] Aprendizaje no supervisado. Aquí no hace falta que se sepa realmente la etiqueta de los datos, simplemente con que el sistema sea capaz de agrupar las cartas que pertenezcan al mismo distrito postal (que tengan el mismo número manuscrito).
       \item[c)] Por refuerzo. No siempre podemos basarnos en datos que ya tenemos para decidir esto (los datos de hace 4 años no tienen por qué ser relevantes ahora), por lo que una aproximación por refuerzo irá aprendiendo sobre la marcha con la actividad actual del mercado de valores.
     \end{enumerate}
@@ -152,9 +152,8 @@
   \begin{solucion}
     Determinemos los aspectos clave:
     \begin{itemize}
-      \item $\mathcal{X}$: Un espacio n-dimensional con las características de los mangos. Podríamos tomar un espacio 3-dimensional donde las características son (color, tamaño, textura).
+      \item $\mathcal{X}$: Un espacio n-dimensional con las características de los mangos. Podríamos tomar un espacio 5-dimensional donde las características son (color, tamaño, textura, tiempo de maduración, peso).
       \item $\mathcal{Y}$: Podemos usar clasificación binaria: 1 si el mango es bueno y -1 si no lo es.
-      \item $\mathcal{A}$: Se propone aprendizaje supervisado, ya que ...
       \item Conjunto de entrenamiento: Un análisis previo de la cosecha midiendo cada una de las características propuestas y determinando si el mango es bueno o no.
       \item $\mathcal{H}$: En principio podríamos intentar buscar en las funciones lineales, ya que son las más sencillas. Si no consiguiéramos un buen clasificador, ya iríamos subiendo la complejidad de estas funciones en busca de un clasificador aceptable.
     \end{itemize}
@@ -332,7 +331,6 @@
 
     Sabemos por definición que $\overline{g}(x) = \mathbb{E}_\mathcal{D}\left[ g^{(\mathcal{D})}(x) \right]$. Como la distribución de los puntos es uniforme, su función de densidad es $f(x) = \frac{1}{\lambda(\mathcal{D})}$, con $\lambda$ la medida del conjunto (que en este caso obviamente es 4). Además, $x_1$ y $x_2$ son independientes. Por tanto la esperanza quedaría:
 
-    $$ \mathbb{E}_\mathcal{D}\left[ g^{(\mathcal{D})}(x) \right] = \mathbb{E}_\mathcal{D}\left[ (x_2+x_1)(x-x_1) + x_1^2 \right] = \frac{1}{\lambda(\mathcal{D})} \int_D g^{(\mathcal{D})}(x) = \frac{1}{4}  \int_{-1}^1 \int_{-1}^1 $$
 
     \begin{equation*}
       \begin{split}
@@ -400,31 +398,103 @@
   \end{bonus}
 
   \begin{solucion}
-    Colocamos $h$ en $y_1 \leq \ldots \leq y_k \leq h \leq y_{k+1} \leq \ldots \leq y_N$. Descomponemos la sumatoria gracias a que todos los valores están ordenados:
 
-    $$E_{in}(h) = \sum_{n=1}^N{|h-y_n|} = \sum_{n=1}^k{(h-y_n)} + \sum_{n=k+1}^N{(y_n-h)} = \sum_{n=1}^k{h}-\sum_{n=1}^k{y_n} + \sum_{n=k+1}^N{y_n}-\sum_{n=k+1}^N{h}$$
+    Resolvemos por partes:
+    \begin{enumerate}
 
-    $$E_{in}(h)= kh-\sum_{n=1}^k{y_n} + \sum_{n=k+1}^N{y_n}-(N-k)h$$
+      \item[a)]Primero colocamos $h$ al inicio del conjunto de datos, $h \leq y_1 \leq \ldots \leq y_n$. Descomponemos la sumatoria (los datos están ordenados) y nos queda:
 
-    Ahora que tenemos los signos arreglados, procedemos a buscar un mínimo, derivando e igualando a cero.
+      $$ E_{in}(h) = \sum_{n=1}^N{|h-y_n|} = \sum_{n=1}^N{(y_n-h)} = \sum_{n=1}^N{y_n} - \sum_{n=1}^N{h} = \sum_{n=1}^N{y_n} - Nh$$
 
-    $$E_{in}'(h) = k - (N - k) = 2k - N = 0 \Leftrightarrow k = \frac{N}{2}$$
+      Derivamos e igualamos a cero para encontrar un extremo:
 
-    Hemos determinado que para que $h$ sea un mínimo, debe estar entre $y_k$ y $y_{k+1}$ con $k=\frac{N}{2}$, que hace que esté en medio de todos los datos. Por tanto, este valor es la mediana. /*Añadir algo para argumentar el caso N impar*/
+      $$E_{in}'(h) = -N = 0 $$
 
+      Lo cual es una contradicción, ya que sería el caso de no haber datos. El caso colocando $h$ al final del conjunto de datos es recíproco, saldría $N=0$.
+
+      Ahora colocamos $h$ en $y_1 \leq \ldots \leq y_k \leq h \leq y_{k+1} \leq \ldots \leq y_N$. Descomponemos la sumatoria gracias a que todos los valores están ordenados:
+
+      $$E_{in}(h) = \sum_{n=1}^N{|h-y_n|} = \sum_{n=1}^k{(h-y_n)} + \sum_{n=k+1}^N{(y_n-h)} = \sum_{n=1}^k{h}-\sum_{n=1}^k{y_n} + \sum_{n=k+1}^N{y_n}-\sum_{n=k+1}^N{h}$$
+
+      $$E_{in}(h)= kh-\sum_{n=1}^k{y_n} + \sum_{n=k+1}^N{y_n}-(N-k)h$$
+
+      Derivamos e igualamos a cero.
+
+      $$E_{in}'(h) = k - (N - k) = 2k - N = 0 \Leftrightarrow k = \frac{N}{2}$$
+
+      Hemos determinado que para que $h$ PUEDA ser un mínimo, debe estar entre $y_k$ y $y_{k+1}$ con $k=\frac{N}{2}$, que hace que esté en medio de todos los datos (deja $k$ datos a la izquierda y $k$ a la derecha). Es claro que es un mínimo ya que si $k < \frac{N}{2}$, $E_{in}'(h) < 0$ y si $k > \frac{N}{2}$, $E_{in}'(h) > 0$, luego la función decrece y luego crece.    Por tanto, este valor es la mediana.
+
+      En el caso de que $N$ sea impar, realizamos el mismo método de arriba, pero como paso preliminar hacemos lo siguiente: el dato colocado en la posición $\frac{N+1}{2}$ lo duplicamos en la lista de datos. Así, el mínimo de la función no cambiaría de posición (sólo trasladamos la función hacia arriba). Al realizar el procedimiento de arriba, tendríamos que para que $h$ sea mínimo debe estar entre el dato $\frac{N+1}{2}$ y $\frac{N+1}{2} + 1$. Pero al haber duplicado el dato $\frac{N+1}{2}$, tenemos que
+
+      $$ y_{\frac{N+1}{2}} = h = y_{\frac{N+1}{2}+1} $$
+
+      Luego $h$ debe estar en la posición de la mediana.
+
+      \item[b)] Para el valor de la mediana, es claro que se queda igual, ya que la mediana es un valor posicional, no depende de los valores de los datos.
+
+      Para el caso de la media procedemos como sigue: esta sería la expresión de la media para el conjunto de datos original y modificado:
+
+      $$ h_{med} = \frac{1}{N} \sum_{n=1}^N{y_n} = \frac{1}{N} \left( \sum_{n=1}^{N-1}{y_n} + y_N \right)$$
+
+      $$ h_{med}' = \frac{1}{N} \sum_{n=1}^N{y_n'} = \frac{1}{N} \left( \sum_{n=1}^{N-1}{y_n} + y_N + \epsilon \right)$$
+
+      Si restamos ambas expresiones nos queda:
+
+      $$ h_{med}' - h_{med} = \frac{1}{N} \left(\epsilon \right)$$
+
+      Luego si $\epsilon \rightarrow \infty$, esta diferencia diverge.
+
+    \end{enumerate}
 
   \end{solucion}
 
   \begin{bonus}
     Considere el ejercicio 12.
     \begin{itemize}
-      \item[a)] Describir un experimento que podamos ejecutar para determinar (numéricamente) $g(x)$, $E_{out}$, \emph{bias} y \emph{var}.
+      \item[a)] Describir un experimento que podamos ejecutar para determinar (numéricamente) $\overline{g}(x)$, $E_{out}$, \emph{bias} y \emph{var}.
 
       \item[b)] Ejecutar el experimento y dar los resultados. Comparar $E_{out}$ con \emph{bias+var}. Dibujar en unos mismos ejes $g(x)$, $E_{out}$ y $f(x)$.
     \end{itemize}
   \end{bonus}
 
   \begin{solucion}
+    Apliquemos las fórmulas que tenemos en las transparencias. Como es una media aritmética, lo aplicaremos sobre varios conjuntos de datos, cada vez más grandes, para ver su comportamiento. Usaremos Python y sus librería \emph{NumPy} y \emph{SymPy} para cálculo numérico y simbólico.
+
+    Se hicieron algunas pruebas con 10000 y 100000 datos, pero se desecharon pronto porque era demasiado tiempo de cómputo (hasta 3 minutos sólo para calcular la $\overline{g}(x)$), y con 1000 datos también se ha probado (la salida está en el propio código), pero se ha dejado un tamaño de 100 datos para que el cálculo sea rápido, aunque el $E_{out}$ mejora un 5\% en el caso de 1000 datos.
+
+    Seguramente la solución propuesta no es la más eficiente, pero ha sido rápido de escribir. La idea es tomar 100 muestras aleatorias en $[-1,1]$ e ir calculando esperanzas como medias de funciones o de valores, según el caso. Primero calculamos $\overline{g}(x)$, luego se calcula $bias(x)$ y su esperanza, $varianza(x)$ y su esperanza y por último $E_{out}^{\mathcal(D)}$ y su esperanza, y se compara con $bias+varianza$.
+
+    \lstinputlisting{bias-var.py}
+
+    Aquí la salida con 100 datos.
+
+    \begin{verbatim}
+      g_media(x) = -0.0240978062019481*x - 0.0506736366465499
+      Bias = 0.237413164642445
+      Calculando varianza...
+      Varianza = 0.365272167591865
+      Calculando Eout_D...
+      Eout_D calculado, ahora la esperanza...
+      Eout con esperanza = 0.602685332234309  Eout usando bias + var = 0.602685332234310
+      Tiempo transcurrido = 5.334069013595581 segundos
+    \end{verbatim}
+
+
+    Y aquí con 1000 datos.
+
+    \begin{verbatim}
+      g_media(x) = -0.0116637213459665*x - 0.0155484354190228
+      Bias = 0.211474902374281
+      Calculando varianza...
+      Varianza = 0.332779003271147
+      Calculando Eout_D...
+      Eout_D calculado, ahora la esperanza...
+      Eout con esperanza = 0.544253905645427  Eout usando bias + var = 0.544253905645428
+      Tiempo transcurrido = 98.63339281082153 segundos
+
+    \end{verbatim}
+
+    Los resultados nos aclaran varias cosas: la importante equivalencia entre $E_{out}$ y $bias+varianza$ y la poca diferencia entre la solución analítica ($bias=\frac{1}{5}$ y $var=\frac{1}{3}$) y la numérica usando sólo 100 datos. Con 1000 datos la diferencia es poco apreciable, aunque el tiempo de cómputo ha sido bastante mayor (las operaciones simbólocas son bastante costosas).
 
   \end{solucion}
 
