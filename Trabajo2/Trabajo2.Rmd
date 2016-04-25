@@ -1,0 +1,36 @@
+---
+title: "Trabajo2"
+author: "Antonio Álvarez Caballero"
+date: "25 de abril de 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Modelos Lineales
+
+## Ejercicio 1
+
+## Ejercicio 2
+
+## Ejercicio 3
+
+## Ejercicio 4
+
+## Ejercicio 5
+
+# Sobreajuste
+
+## Ejercicio 1
+
+## Ejercicio 2
+
+## Ejercicio 3
+
+# Regularización y selección de modelos
+
+## Ejercicio 1
+
+## Ejercicio 2
