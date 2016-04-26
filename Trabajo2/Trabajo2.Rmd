@@ -10,7 +10,33 @@ knitr::opts_chunk$set(echo = TRUE)
 library(numDeriv)
 library(ggplot2)
 library(reshape)
+set.seed(12345678)
 ```
+
+```{r funcionesAuxiliares, include=FALSE}
+simula_unif = function (N=2,dims=2, rango = c(0,1)){
+ m = data.frame(matrix(runif(N*dims, min=rango[1], max=rango[2]),
+ nrow = N, ncol=dims, byrow=T))
+ 
+ colnames(m) <- c("X","Y")
+ return(m)
+}
+
+simula_recta <- function(intervalo){
+  A <- runif(2, intervalo[1], intervalo[length(intervalo)])
+  B <- runif(2, intervalo[1], intervalo[length(intervalo)])
+  
+  # La pendiente m es el cociente de las diferencias de las componentes
+  m <- (A[2] - B[2]) / (A[1] - B[1])
+  
+  # La traslación b la sacamos despejando de y = ax + b
+  b <- A[2] - m * A[1]
+  
+  # Lo devolvemos en este orden para ser consistentes con abline
+  return(c(b,m))
+}
+```
+
 
 # Modelos Lineales
 
@@ -199,6 +225,20 @@ metodoNewton <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
 Parece ser que el método del gradiente descendente es más efectivo: se queda menos estancado y consigue llegar a valores más bajos de la función con las mismas iteraciones.
 
 ## Ejercicio 4
+
+Vamos a crear nuestra muestra e ir tomando etiquetas.
+
+```{r 4, echo=FALSE}
+datos <- simula_unif(N = 100, rango = c(-1,1))
+recta <- simula_recta(c(-1,1))
+
+datos.etiquetados <- cbind(datos, Etiqueta = sign(datos$Y - recta[2]*datos$X - recta[1])/2 + 1/2)
+
+ggplot(data=datos.etiquetados, aes(x = X, y = Y), colour = Etiqueta) + 
+  geom_point(aes(colour = Etiqueta)) +
+  geom_abline(intercept = recta[1], slope = recta[2])
+```
+
 
 ## Ejercicio 5
 
