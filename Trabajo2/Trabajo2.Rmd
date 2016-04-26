@@ -2,12 +2,14 @@
 title: "Trabajo2"
 author: "Antonio Álvarez Caballero"
 date: "25 de abril de 2016"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(numDeriv)
+library(ggplot2)
+library(reshape)
 ```
 
 # Modelos Lineales
@@ -30,7 +32,7 @@ gradienteDescendente <- function(funcion, sol_inicial = rep(0,2), tol = 1e-14,
     imagenes = c(imagenes, funcion(w))
     t = t+1
   }
-  return(list("Solución" = w, "Valor" = funcion(w), "Iteraciones" = t))
+  return(list("Solucion" = w, "Valor" = funcion(w), "Iteraciones" = t, "Imagenes" = imagenes))
 }
 ```
 
@@ -38,13 +40,113 @@ Vamos a probarla sobre la función $E(u,v)=(ue^v -2ve^{-u})^2$, cuyo gradiente e
 
 $$\nabla E(u,v) = 2 \left(u e^{v} - 2 v e^{- u}\right) \cdot \left(  \left(2 v e^{- u} +  e^{v}\right) , \left(u e^{v} - 2 e^{- u}\right) \right)$$
 
-```{r pruebaGD}
-  gradienteDescendente(function(w) {(w[1]*exp(w[2]) - 2*w[2]*exp(-w[1]))^2}, c(1,1))
+```{r 1a}
+  e <- function(w) {(w[1]*exp(w[2]) - 2*w[2]*exp(-w[1]))^2}
+  resultado = gradienteDescendente(e, c(1,1))
+  resultado[c("Solucion", "Valor", "Iteraciones")]
 ```
 
+Ahora realizamos lo mismo con la función $f$, esta vez con $\eta = 0.01$ y con 50 iteraciones máximo.
 
+$$f(x,y) = x^2 + 2y^2 + 2sin(2 \pi x) sin(2 \pi y)$$
+
+```{r 1b1, echo=FALSE}
+  f <- function(w) { w[1]^2 + 2*w[2]^2 + 2*sin(2*pi*w[1])*sin(2*pi*w[2]) }
+  resultado = gradienteDescendente(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.01)
+
+  resultado2 = gradienteDescendente(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.1)
+  
+  l1 = length(resultado$Imagenes)
+  l2 = length(resultado2$Imagenes)
+  
+  datos <- data.frame(Iteraciones = 1:resultado$Iteraciones,
+         Imagen1 = c(resultado$Imagenes,rep(resultado$Imagenes[l1-1], max(50 - l1,0)) ),
+         Imagen2 = c(resultado2$Imagenes,rep(resultado2$Imagenes[l2-1], max(50 - l2,0)) )
+  )
+  
+  ggplot(data=datos, aes(x = Iteraciones)) +
+    geom_line(aes(y=Imagen1), colour = "blue") + 
+    geom_line(aes(y=Imagen2), colour = "green") +
+    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) +
+    scale_shape_discrete(name="Experimental\nCondition",
+                         breaks=c("Imagen1", "Imagen2"),
+                         labels=c("Control", "Treatment 1"))
+    
+
+
+```
+
+La línea azul representa la tasa $0.01$, lo cual presenta un descenso estable frente a la línea verde, que representa la tasa $0.1$, que va dando saltos.
+
+Ahora vamos a hacer lo mismo pero con distintos puntos de partida.
+
+```{r 1b2, echo=FALSE}
+  resultado = gradienteDescendente(f, sol_inicial = c(0.1,0.1), max_iter = 50, tasa_aprendizaje = 0.01)
+  resultado2 = gradienteDescendente(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.01)
+  resultado3 = gradienteDescendente(f, sol_inicial = c(-0.5,-0.5), max_iter = 50, tasa_aprendizaje = 0.01)
+  resultado4 = gradienteDescendente(f, sol_inicial = c(-1,-1), max_iter = 50, tasa_aprendizaje = 0.01)
+
+  l1 = length(resultado$Imagenes)
+  l2 = length(resultado2$Imagenes)
+  l3 = length(resultado3$Imagenes)
+  l4 = length(resultado4$Imagenes)
+  
+  datos <- data.frame(Iteraciones = 1:50,
+         Imagen1 = c(resultado$Imagenes, rep(resultado$Imagenes[l1-1],  max(50 - l1,0)) ),
+         Imagen2 = c(resultado2$Imagenes,rep(resultado2$Imagenes[l2-1], max(50 - l2,0)) ),
+         Imagen3 = c(resultado3$Imagenes,rep(resultado3$Imagenes[l3-1], max(50 - l3,0)) ),
+         Imagen4 = c(resultado4$Imagenes,rep(resultado4$Imagenes[l4-1], max(50 - l4,0)) )
+  )
+  
+  ggplot(data=datos, aes(x = Iteraciones)) +
+    geom_line(aes(y=Imagen1), colour = "blue") + 
+    geom_line(aes(y=Imagen2), colour = "green") +
+    geom_line(aes(y=Imagen3), colour = "red") + 
+    geom_line(aes(y=Imagen4), colour = "black") +
+    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) 
+  
+```
+
+```{r 1b2.2}
+  print(datos)
+```
+
+El principal problema de encontrar el mínimo de una función arbitraria es escoger el punto inicial, ya que los métodos clásicos siempre quedarán estancados en mínimos locales.
 
 ## Ejercicio 2
+
+Vamos a implementar el método de coordenada descendente. 
+
+```{r 2}
+coordenadaDescendente <- function(funcion, sol_inicial = rep(0,2), tol = 1e-14, 
+                                 max_iter = 150000, tasa_aprendizaje = 0.1) {
+  w = sol_inicial
+  t = 1
+  imagenes = funcion(w)
+  
+  while (t < max_iter && funcion(w) > tol){
+    gradiente = grad(funcion, x=w)
+    direccion = -gradiente
+    w[1] = w[1] + tasa_aprendizaje * direccion[1]
+    
+    gradiente = grad(funcion, x=w)
+    direccion = -gradiente
+    w[2] = w[2] + tasa_aprendizaje * direccion[2]
+    
+    imagenes = c(imagenes, funcion(w))
+    t = t+1
+  }
+  return(list("Solucion" = w, "Valor" = funcion(w), "Iteraciones" = t, "Imagenes" = imagenes))
+}
+```
+
+Veamos su comportamiento con la función $E(u,v)$.
+
+```{r 2a}
+  resultado <- coordenadaDescendente(e, sol_inicial = c(1,1), max_iter = 15, tasa_aprendizaje = 0.1)
+  resultado[c("Solucion", "Iteraciones", "Valor")]
+```
+
 
 ## Ejercicio 3
 
