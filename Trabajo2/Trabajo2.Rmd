@@ -19,7 +19,7 @@ library(reshape)
 Vamos a implementar el algoritmo de gradiente descendente.
 
 ```{r gradienteDescendente}
-gradienteDescendente <- function(funcion, sol_inicial = rep(0,2), tol = 1e-14, 
+gradienteDescendente <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14, 
                                  max_iter = 150000, tasa_aprendizaje = 0.1) {
   w = sol_inicial
   t = 1
@@ -42,7 +42,7 @@ $$\nabla E(u,v) = 2 \left(u e^{v} - 2 v e^{- u}\right) \cdot \left(  \left(2 v e
 
 ```{r 1a}
   e <- function(w) {(w[1]*exp(w[2]) - 2*w[2]*exp(-w[1]))^2}
-  resultado = gradienteDescendente(e, c(1,1))
+  resultado = gradienteDescendente(e, c(1,1), tol = 1e-14)
   resultado[c("Solucion", "Valor", "Iteraciones")]
 ```
 
@@ -67,10 +67,7 @@ $$f(x,y) = x^2 + 2y^2 + 2sin(2 \pi x) sin(2 \pi y)$$
   ggplot(data=datos, aes(x = Iteraciones)) +
     geom_line(aes(y=Imagen1), colour = "blue") + 
     geom_line(aes(y=Imagen2), colour = "green") +
-    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) +
-    scale_shape_discrete(name="Experimental\nCondition",
-                         breaks=c("Imagen1", "Imagen2"),
-                         labels=c("Control", "Treatment 1"))
+    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen"))
     
 
 
@@ -118,7 +115,7 @@ El principal problema de encontrar el mínimo de una función arbitraria es esco
 Vamos a implementar el método de coordenada descendente. 
 
 ```{r 2}
-coordenadaDescendente <- function(funcion, sol_inicial = rep(0,2), tol = 1e-14, 
+coordenadaDescendente <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14, 
                                  max_iter = 150000, tasa_aprendizaje = 0.1) {
   w = sol_inicial
   t = 1
@@ -147,8 +144,59 @@ Veamos su comportamiento con la función $E(u,v)$.
   resultado[c("Solucion", "Iteraciones", "Valor")]
 ```
 
+Este método parece, a priori, peor. En principio es más lento (da dos pasos para realizar menos que lo que hace el gradiente descendente en uno), además de que, en general en Matemáticas, las soluciones "iteradas" de los problemas no suelen ser buenos.
 
 ## Ejercicio 3
+
+Vamos a implementar el método de Newton para minimización.
+
+```{r Newton}
+metodoNewton <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
+                         max_iter = 150000, tasa_aprendizaje = 0.1) {
+  w = sol_inicial
+  t = 1
+  imagenes = funcion(w)
+  
+  while (t < max_iter && funcion(w) > tol){
+    H = hessian(funcion, x=w)
+    gradiente = grad(funcion, x=w)
+    direccion = -solve(H)%*%gradiente
+    
+    w = w + tasa_aprendizaje*direccion
+    imagenes = c(imagenes, funcion(w))
+    t = t+1
+  }
+  return(list("Solucion" = w, "Valor" = funcion(w), "Iteraciones" = t, "Imagenes" = imagenes))
+}
+```
+
+```{r 3a, echo=FALSE}
+  resultado = metodoNewton(f, sol_inicial = c(0.1,0.1), max_iter = 50, tasa_aprendizaje = 0.01)
+  resultado2 = metodoNewton(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.01)
+  resultado3 = metodoNewton(f, sol_inicial = c(-0.5,-0.5), max_iter = 50, tasa_aprendizaje = 0.01)
+  resultado4 = metodoNewton(f, sol_inicial = c(-1,-1), max_iter = 50, tasa_aprendizaje = 0.01)
+
+  l1 = length(resultado$Imagenes)
+  l2 = length(resultado2$Imagenes)
+  l3 = length(resultado3$Imagenes)
+  l4 = length(resultado4$Imagenes)
+  
+  datos <- data.frame(Iteraciones = 1:50,
+         Imagen1 = c(resultado$Imagenes, rep(resultado$Imagenes[l1-1],  max(50 - l1,0)) ),
+         Imagen2 = c(resultado2$Imagenes,rep(resultado2$Imagenes[l2-1], max(50 - l2,0)) ),
+         Imagen3 = c(resultado3$Imagenes,rep(resultado3$Imagenes[l3-1], max(50 - l3,0)) ),
+         Imagen4 = c(resultado4$Imagenes,rep(resultado4$Imagenes[l4-1], max(50 - l4,0)) )
+  )
+  
+  ggplot(data=datos, aes(x = Iteraciones)) +
+    geom_line(aes(y=Imagen1), colour = "blue") + 
+    geom_line(aes(y=Imagen2), colour = "green") +
+    geom_line(aes(y=Imagen3), colour = "red") + 
+    geom_line(aes(y=Imagen4), colour = "black") +
+    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) 
+```
+
+Parece ser que el método del gradiente descendente es más efectivo: se queda menos estancado y consigue llegar a valores más bajos de la función con las mismas iteraciones.
 
 ## Ejercicio 4
 
