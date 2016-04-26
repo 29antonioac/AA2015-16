@@ -7,11 +7,42 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(numDeriv)
 ```
 
 # Modelos Lineales
 
 ## Ejercicio 1
+
+Vamos a implementar el algoritmo de gradiente descendente.
+
+```{r gradienteDescendente}
+gradienteDescendente <- function(funcion, sol_inicial = rep(0,2), tol = 1e-14, 
+                                 max_iter = 150000, tasa_aprendizaje = 0.1) {
+  w = sol_inicial
+  t = 1
+  imagenes = funcion(w)
+  
+  while (t < max_iter && funcion(w) > tol){
+    gradiente = grad(funcion, x=w)
+    direccion = -gradiente
+    w = w + tasa_aprendizaje * direccion
+    imagenes = c(imagenes, funcion(w))
+    t = t+1
+  }
+  return(list("Solución" = w, "Valor" = funcion(w), "Iteraciones" = t))
+}
+```
+
+Vamos a probarla sobre la función $E(u,v)=(ue^v -2ve^{-u})^2$, cuyo gradiente es 
+
+$$\nabla E(u,v) = 2 \left(u e^{v} - 2 v e^{- u}\right) \cdot \left(  \left(2 v e^{- u} +  e^{v}\right) , \left(u e^{v} - 2 e^{- u}\right) \right)$$
+
+```{r pruebaGD}
+  gradienteDescendente(function(w) {(w[1]*exp(w[2]) - 2*w[2]*exp(-w[1]))^2}, c(1,1))
+```
+
+
 
 ## Ejercicio 2
 
