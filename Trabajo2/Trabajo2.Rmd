@@ -1,7 +1,6 @@
 ---
 title: "Trabajo2"
 author: "Antonio Álvarez Caballero"
-date: "25 de abril de 2016"
 output: html_document
 ---
 
@@ -170,7 +169,8 @@ $$f(x,y) = x^2 + 2y^2 + 2sin(2 \pi x) sin(2 \pi y)$$
   ggplot(data=datos, aes(x = Iteraciones)) +
     geom_line(aes(y=Imagen1), colour = "blue") + 
     geom_line(aes(y=Imagen2), colour = "green") +
-    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen"))
+    labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) +
+    scale_colour_manual(name = "Legend", values = c(1,2,3,4))
     
 
 
@@ -357,10 +357,11 @@ print(resultado)
 print(recta)
 
 ggplot(data=datos.etiquetados, aes(x = X, y = Y), colour = factor(Etiqueta)) + 
-  geom_point(aes(colour = Etiqueta)) +
+  geom_point(aes(colour = factor(Etiqueta))) +
   geom_abline(intercept = recta[1], slope = recta[2], color = "red") +
   geom_abline(intercept = recta.regresion[1], slope = recta.regresion[2], color = "blue") +
   theme(legend.title=element_blank())
+
 ```
 
 Y calculemos el $E_{out}$ con un conjunto de test de 1000 muestras.
@@ -528,8 +529,8 @@ legendre <- function(k,x){
 Ahora tenemos que definir el experimento. Como se suponen $Q_f$, $N$ y $\sigma$ definidos, lo hacemos:
 
 ```{r defPrevia}
-Qf <- 50
-N <- 200
+Qf <- 20
+N <- 50
 sigma <- 1
 ```
 
@@ -610,7 +611,15 @@ legendre.g2.eout <- sum((legendre.test.y - legendre.test.g2)^2) / num_muestras
 legendre.g10.eout <- sum((legendre.test.y - legendre.test.g10)^2) / num_muestras
 ```
 
-Tenemos entonces que $E_{out}(g_2) \approx$ ```r I(legendre.g2.eout*100)``` y $E_{out}(g_{10}) \approx$ ```r I(legendre.g10.eout*100)```.
+Tenemos entonces que $E_{out}(g_2) \approx$ ```r I(legendre.g2.eout*100)``` y $E_{out}(g_{10}) \approx$ ```r I(legendre.g10.eout*100)```. Se ve claramente el sobreajuste que tiene $g_{10}$: el error fuera de la muestra aumenta muchísimo.
+
+Normalizar $f$ se hace para llevar a la misma escala la desviación típica del ruido, $\sigma$, que la propia función $f$, debido a que $\sigma$ es una constante multiplicativa que influye en el ruido de los datos.
+
+Para calcular analíticamente $E_{out}$ debemos calcular esta integral definida:
+
+$$ \int_{\mathcal{D}} g_{10} - f $$
+
+Siendo f la función objetivo sin ruido.
 
 
 ## Ejercicio 2
