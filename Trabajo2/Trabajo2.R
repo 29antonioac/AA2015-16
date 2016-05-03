@@ -1,19 +1,11 @@
----
-title: "Trabajo2"
-author: "Antonio Álvarez Caballero"
-output: pdf_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+## ----setup, include=FALSE------------------------------------------------
 library(knitr)
 library(numDeriv)
 library(ggplot2)
-library(reshape)
 set.seed(12345678)
-```
+X11()
 
-```{r funcionesAuxiliares, include=FALSE}
+## ----funcionesAuxiliares, include=FALSE----------------------------------
 simula_unif = function (N=2,dims=2, rango = c(0,1)){
  m = data.frame(matrix(runif(N*dims, min=rango[1], max=rango[2]),
  nrow = N, ncol=dims, byrow=T))
@@ -111,16 +103,13 @@ ajusta_PLA_MOD <- function(datos, label, max_iter, vini){
                     "Recta" = c(-mejor[1]/mejor[3], -mejor[2]/mejor[3]) )
   return (resultado)
 }
-```
 
+pausa <- function(){
+  cat("Pulsa cualquier caracter")
+  ch <- scan()
+}
 
-# Modelos Lineales
-
-## Ejercicio 1
-
-Vamos a implementar el algoritmo de gradiente descendente.
-
-```{r gradienteDescendente}
+## ----gradienteDescendente------------------------------------------------
 gradienteDescendente <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14, 
                                  max_iter = 150000, tasa_aprendizaje = 0.1) {
   w <- sol_inicial
@@ -136,23 +125,14 @@ gradienteDescendente <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
   }
   return(list("Solucion" = w, "Valor" = funcion(w), "Iteraciones" = t, "Imagenes" = imagenes))
 }
-```
 
-Vamos a probarla sobre la función $E(u,v)=(ue^v -2ve^{-u})^2$, cuyo gradiente es 
-
-$$\nabla E(u,v) = 2 \left(u e^{v} - 2 v e^{- u}\right) \cdot \left(  \left(2 v e^{- u} +  e^{v}\right) , \left(u e^{v} - 2 e^{- u}\right) \right)$$
-
-```{r 1a}
+## ----1a------------------------------------------------------------------
   e <- function(w) {(w[1]*exp(w[2]) - 2*w[2]*exp(-w[1]))^2}
   resultado <- gradienteDescendente(e, c(1,1), tol = 1e-14)
   resultado[c("Solucion", "Valor", "Iteraciones")]
-```
+  print("Gradiente descendente")
 
-Ahora realizamos lo mismo con la función $f$, esta vez con $\eta = 0.01$ y con 50 iteraciones máximo.
-
-$$f(x,y) = x^2 + 2y^2 + 2sin(2 \pi x) sin(2 \pi y)$$
-
-```{r 1b1, echo=FALSE}
+## ----1b1, echo=FALSE-----------------------------------------------------
   f <- function(w) { w[1]^2 + 2*w[2]^2 + 2*sin(2*pi*w[1])*sin(2*pi*w[2]) }
   resultado <- gradienteDescendente(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.01)
 
@@ -172,15 +152,10 @@ $$f(x,y) = x^2 + 2y^2 + 2sin(2 \pi x) sin(2 \pi y)$$
     labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) +
     scale_colour_manual(name = "Legend", values = c(1,2,3,4))
     
+  pausa()
 
 
-```
-
-La línea azul representa la tasa $0.01$, lo cual presenta un descenso estable frente a la línea verde, que representa la tasa $0.1$, que va dando saltos.
-
-Ahora vamos a hacer lo mismo pero con distintos puntos de partida.
-
-```{r 1b2, echo=FALSE}
+## ----1b2, echo=FALSE-----------------------------------------------------
   resultado <- gradienteDescendente(f, sol_inicial = c(0.1,0.1), max_iter = 50, tasa_aprendizaje = 0.01)
   resultado2 <- gradienteDescendente(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.01)
   resultado3 <- gradienteDescendente(f, sol_inicial = c(-0.5,-0.5), max_iter = 50, tasa_aprendizaje = 0.01)
@@ -205,19 +180,14 @@ Ahora vamos a hacer lo mismo pero con distintos puntos de partida.
     geom_line(aes(y=Imagen4), colour = "black") +
     labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) 
   
-```
 
-```{r 1b2.2, echo=FALSE}
+
+## ----1b2.2, echo=FALSE---------------------------------------------------
+  print("Gradiente descendente con distintos puntos de inicio")
   kable(datos)
-```
+  pausa()
 
-El principal problema de encontrar el mínimo de una función arbitraria es escoger el punto inicial, ya que los métodos clásicos siempre quedarán estancados en mínimos locales.
-
-## Ejercicio 2
-
-Vamos a implementar el método de coordenada descendente. 
-
-```{r 2}
+## ----2-------------------------------------------------------------------
 coordenadaDescendente <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14, 
                                  max_iter = 150000, tasa_aprendizaje = 0.1) {
   w <- sol_inicial
@@ -238,22 +208,13 @@ coordenadaDescendente <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
   }
   return(list("Solucion" = w, "Valor" = funcion(w), "Iteraciones" = t, "Imagenes" = imagenes))
 }
-```
 
-Veamos su comportamiento con la función $E(u,v)$.
-
-```{r 2a}
+## ----2a------------------------------------------------------------------
   resultado <- coordenadaDescendente(e, sol_inicial = c(1,1), max_iter = 15, tasa_aprendizaje = 0.1)
   resultado[c("Solucion", "Iteraciones", "Valor")]
-```
-
-Este método parece, a priori, peor. En principio es más lento (da dos pasos para realizar menos que lo que hace el gradiente descendente en uno), además de que, en general en Matemáticas, las soluciones "iteradas" de los problemas no suelen ser buenos.
-
-## Ejercicio 3
-
-Vamos a implementar el método de Newton para minimización.
-
-```{r Newton}
+  print("Coordenada descendente")
+  pausa()
+## ----Newton--------------------------------------------------------------
 metodoNewton <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
                          max_iter = 150000, tasa_aprendizaje = 0.1) {
   w <- sol_inicial
@@ -271,9 +232,8 @@ metodoNewton <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
   }
   return(list("Solucion" = w, "Valor" = funcion(w), "Iteraciones" = t, "Imagenes" = imagenes))
 }
-```
 
-```{r 3a, echo=FALSE}
+## ----3a, echo=FALSE------------------------------------------------------
   resultado <- metodoNewton(f, sol_inicial = c(0.1,0.1), max_iter = 50, tasa_aprendizaje = 0.01)
   resultado2 <- metodoNewton(f, sol_inicial = c(1,1), max_iter = 50, tasa_aprendizaje = 0.01)
   resultado3 <- metodoNewton(f, sol_inicial = c(-0.5,-0.5), max_iter = 50, tasa_aprendizaje = 0.01)
@@ -297,31 +257,26 @@ metodoNewton <- function(funcion, sol_inicial = rep(0,2), tol = -1e+14,
     geom_line(aes(y=Imagen3), colour = "red") + 
     geom_line(aes(y=Imagen4), colour = "black") +
     labs(list(title = "Evolución de imágenes", x = "Iteraciones", y = "Imagen")) 
-```
 
-Parece ser que el método del gradiente descendente es más efectivo: se queda menos estancado y consigue llegar a valores más bajos de la función con las mismas iteraciones.
-
-## Ejercicio 4
-
-Vamos a crear nuestra muestra e ir tomando etiquetas.
-
-```{r 4, echo=FALSE}
+  print("Método de Newton")
+  pausa()
+  
+## ----4, echo=FALSE-------------------------------------------------------
 datos <- simula_unif(N = 100, rango = c(-1,1))
 recta <- simula_recta(c(-1,1))
 
 datos.etiquetados <- cbind(datos, Etiqueta = sign(datos$Y - recta[2]*datos$X - recta[1])/2 + 1/2)
 
 ggplot(data=datos.etiquetados, aes(x = X, y = Y)) + 
+  ggtitle("Datos clasificados con función estimada") +
   geom_point(aes(colour = factor(Etiqueta))) +
   geom_abline(intercept = recta[1], slope = recta[2]) +
   theme(legend.title=element_blank())
-```
 
-Ahora vamos a implementar el gradiente descendente estocástico.
+pausa()
 
-```{r gradienteDescendenteEstocastico}
-regresionLogistica <- function(datos, etiquetas, sol_inicial = rep(0,3), tol = 0.01, 
-                               tasa_aprendizaje = 0.01) {
+## ----gradienteDescendenteEstocastico-------------------------------------
+regresionLogistica <- function(datos, etiquetas, sol_inicial = rep(0,3), tol = 0.01, tasa_aprendizaje = 0.01) {
   w.actual <- sol_inicial
   t <- 0
   datos <- cbind(1,datos)
@@ -344,47 +299,31 @@ regresionLogistica <- function(datos, etiquetas, sol_inicial = rep(0,3), tol = 0
       w.actual <- w.actual - tasa_aprendizaje*g_t
     }
   }
-  return(list("Pesos" = w.actual, "Recta" = c(-w.actual[1]/w.actual[3], -w.actual[2]/w.actual[3]), 
-              "Iteraciones" = t))
+  return(list("Pesos" = w.actual, "Recta" = c(-w.actual[1]/w.actual[3], -w.actual[2]/w.actual[3]), "Iteraciones" = t))
 }
-```
 
-Vamos a probarlo sobre el conjunto de antes.
-
-```{r 4b}
+## ----4b------------------------------------------------------------------
 # datos.etiquetados
 resultado <- regresionLogistica(datos, datos.etiquetados["Etiqueta"])
 recta.regresion <- resultado$Recta
 
-print(resultado)
-print(recta)
-
 ggplot(data=datos.etiquetados, aes(x = X, y = Y), colour = factor(Etiqueta)) + 
+  ggtitle("Datos etiquetados con regresión logística") +
   geom_point(aes(colour = factor(Etiqueta))) +
   geom_abline(intercept = recta[1], slope = recta[2], color = "red") +
   geom_abline(intercept = recta.regresion[1], slope = recta.regresion[2], color = "blue") +
   theme(legend.title=element_blank())
 
-```
-
-Y calculemos el $E_{out}$ con un conjunto de test de 1000 muestras.
-
-```{r 4b2}
+## ----4b2-----------------------------------------------------------------
 tamanio = 1000
 datos.test <- simula_unif(N = tamanio, d = 2, rango = c(-1,1))
 datos.test.etiquetas <- sign(datos.test$Y - recta[2]*datos.test$X - recta[1])/2 + 1/2
-datos.test.etiquetas.regresion <- sign(datos.test$Y - recta.regresion[2]*datos.test$X - 
-                                         recta.regresion[1])/2 + 1/2
+datos.test.etiquetas.regresion <- sign(datos.test$Y - recta.regresion[2]*datos.test$X - recta.regresion[1])/2 + 1/2
 Eout <- sum(datos.test.etiquetas != datos.test.etiquetas) / tamanio
-```
-
-El $E_{out}$ es `r I(Eout*100)`%.
-
-## Ejercicio 5
-
-Cojamos las muestras de 1 y 5 de los ficheros de datos y las visualizamos.
-
-```{r 5}
+print("Regresión logística")
+print(paste("El Eout es",Eout))
+pausa()
+## ----5-------------------------------------------------------------------
 digitos.train <- read.table("datos/zip.train")
 digitos.test <- read.table("datos/zip.test")
 
@@ -422,19 +361,19 @@ datos.digitos.test <- data.frame(Etiqueta = digitos.test$V1,
                                   Simetria = simetrias.test)
 
 ggplot(data=datos.digitos.train, aes(x = Media, y = Simetria)) +
+  ggtitle("Datos de entrenamiento") +
   geom_point(aes(colour = factor(Etiqueta))) +
   theme(legend.title=element_blank())
   
+pausa()
 
 ggplot(data=datos.digitos.test, aes(x = Media, y = Simetria)) +
+  ggtitle("Datos de test") +
   geom_point(aes(colour = factor(Etiqueta))) +
   theme(legend.title=element_blank())
 
-```
-
-Ahora vamos a crear una recta de clasificación usando regresión lineal y el _PLA Pocket_ como mejora.
-
-```{r 5a}
+pausa()
+## ----5a------------------------------------------------------------------
 recta.regresion.digitos <- regres_lin(datos.digitos.train[,c("Media", "Simetria")], 
                                       datos.digitos.train[,c("Etiqueta")] * (-1/2) + 3/2,
                                       pesos = TRUE)
@@ -449,25 +388,23 @@ recta.regresion.digitos.coeficientes <- recta.regresion.digitos.mejorado$Recta
 ggplot(data=datos.digitos.train, aes(x = Media, y = Simetria)) +
   ggtitle("Clasificación en datos de entrenamiento") +
   geom_point(aes(colour = factor(Etiqueta))) +
-  geom_abline(intercept = recta.regresion.digitos.coeficientes[1], 
-              slope = recta.regresion.digitos.coeficientes[2], 
+  geom_abline(intercept = recta.regresion.digitos.coeficientes[1], slope = recta.regresion.digitos.coeficientes[2], 
               color = "yellow") +
   theme(legend.title = element_text(colour="black", size=10, face="bold"))+
   scale_color_discrete(name="Números manuscritos")
+
+pausa()
 
 ggplot(data=datos.digitos.test, aes(x = Media, y = Simetria)) +
   ggtitle("Clasificación en datos de test") +
   geom_point(aes(colour = factor(Etiqueta))) +
-  geom_abline(intercept = recta.regresion.digitos.coeficientes[1], 
-              slope = recta.regresion.digitos.coeficientes[2], 
+  geom_abline(intercept = recta.regresion.digitos.coeficientes[1], slope = recta.regresion.digitos.coeficientes[2], 
               color = "yellow") +
   theme(legend.title = element_text(colour="black", size=10, face="bold"))+
   scale_color_discrete(name="Números manuscritos")
-```
 
-Veamos los errores dentro de la muestra y de los datos de test.
 
-```{r 5b, include=FALSE}
+## ----5b, include=FALSE---------------------------------------------------
 Ein <- recta.regresion.digitos.mejorado$Errores / nrow(datos.digitos.train)
 Etest <- sum(apply(cbind(1,datos.digitos.test[,c("Media","Simetria")]), 
                    1, 
@@ -475,48 +412,24 @@ Etest <- sum(apply(cbind(1,datos.digitos.test[,c("Media","Simetria")]),
               ) != 
                datos.digitos.test[,c("Etiqueta")] * (-1/2) + 3/2 ) /
             nrow(datos.digitos.test)
-```
 
-$E_{in} \approx `r I(Ein*100)`\%$ y $E_{test} \approx`r I(Etest*100)`\%$.
-
-Basándonos en $E_{in}$ podemos usar la cota de generalización de Vapnik-Chervonenkis para obtener una cota de $E_{out}$. Para todo $\delta > 0$:
-
-$$ E_{out}(g) \leq E_{in}(g) + \sqrt{\frac{8}{N}ln\left(\frac{4m_{\mathcal{H}}(2N)}{\delta}\right)} = E_{in}(g) + \sqrt{\frac{8}{N}ln\left(\frac{4(2N)^{d_{VC}} + 4}{\delta}\right)} $$
-
-En nuestro caso $\delta=0.05$, por lo que esta cota es válida con probabilidad mayor o igual a $0.95$. El número de muestras es $N=`r I(nrow(datos.digitos.train))`$ y la dimensión de VC es 3, ya que estamos ante un problema de separabilidad lineal. 
-
-```{r cotasVC}
+## ----cotasVC-------------------------------------------------------------
 N <- nrow(datos.digitos.train)
 delta <- 0.05
 dVC <- 3
 Eout.in <- Ein + sqrt((8/N) * log((4*(2*N)^dVC+4)/delta))
-```
 
-Entonces, $E_{out} \leq `r I(Eout.in)`$.
-
-Para el caso de estudiar el error fuera de la muestra usando el de test, usamos la desigualdad de Hoeffding, que nos dice:
-
-$$ P(\vert E_{test}(g) - E_{out}(g) \vert > \varepsilon) \leq 2 e^{-2N\varepsilon^2} $$
-
-Igualando el miembro de la derecha a $\delta$, sólo tenemos que despejar $\varepsilon$ para ver que $E_{out} \leq E_{test}(g) + \varepsilon$ con un 95% de confianza.
-
-
-```{r cotaHoeffding}
+## ----cotaHoeffding-------------------------------------------------------
 N <- nrow(datos.digitos.test)
 delta <- 0.05
 epsilon = sqrt(-log(delta/2)/(2*nrow(datos.digitos.test)))
 Eout.test <- Etest + epsilon
-```
 
-Con estos datos vemos que $E_{out} \leq E_{test}(g) + \varepsilon = `r I(Eout.test)`$, lo cual es una cota más restrictiva, por lo que es mejor para generalizar el error fuera de la muestra.
+print(paste("El error fuera de la muestra generalizando con Ein es",Eout.in))
+print(paste("El error fuera de la muestra generalizando con Etest es",Eout.test))
 
-# Sobreajuste
-
-## Ejercicio 1
-
-El primer paso para resolver estos ejercicios es definir una función para calcular el polinomio de Legendre de orden $k$ en el punto $x$. Una definición recursiva es más fácil, pero mucho menos eficiente, por lo que implementaremos una versión iterativa.
-
-```{r Legendre}
+pausa()
+## ----Legendre------------------------------------------------------------
 legendre <- function(k,x){
   resultado <- c(1,x)
   grado <- 3
@@ -530,26 +443,17 @@ legendre <- function(k,x){
 
   return(resultado[k+1])
 }
-```
 
-Ahora tenemos que definir el experimento. Como se suponen $Q_f$, $N$ y $\sigma$ definidos, lo hacemos:
-
-```{r defPrevia}
+## ----defPrevia-----------------------------------------------------------
 Qf <- 20
 N <- 50
 sigma <- 1
-```
 
-El siguiente paso es determinar los coeficientes $a_q$ como viene definido en el guión:
-
-```{r aq}
+## ----aq------------------------------------------------------------------
 divisor <- sqrt(sum(sapply(0:Qf, function(q) {1 / (2*q+1)})))
 a_q <- rnorm(Qf+1) / divisor
-```
 
-Y ahora generamos el conjunto de datos. Para ello tenemos que generar una función auxiliar para generar $\sum_{q=0}^{Q_f}(a_q L_q(x))$
-
-```{r sumaLegendre}
+## ----sumaLegendre--------------------------------------------------------
 legendre.suma <- function(x) {
   suma <- 0
   for (i in 0:Qf){
@@ -564,19 +468,17 @@ legendre.y <- sapply(legendre.x, legendre.suma) + sigma*legendre.ruido
 legendre.df <- data.frame(X = legendre.x, Y = legendre.y)
 
 ggplot(legendre.df, aes(X,Y)) +
+  ggtitle("Puntos para estudiar sobreajuste") +
   geom_point()
-```
 
-Ahora tenemos que transformar los datos a $\mathcal{H}_2$ y $\mathcal{H}_{10}$, y usaremos regresión lineal para aproximar dichos datos.
+print("Puntos para ver sobreajuste")
+pausa()
 
-```{r transformacionH2H10}
+## ----transformacionH2H10-------------------------------------------------
 legendre.datos.h2 <- t(sapply(legendre.x, function(x) { sapply(1:2, function(n) {x^n})}))
 legendre.datos.h10 <- t(sapply(legendre.x, function(x) { sapply(1:10, function(n) {x^n})}))
-```
 
-Usando regresión lineal aproximaremos estos datos.
-
-```{r g2g10}
+## ----g2g10---------------------------------------------------------------
 legendre.g2.pesos <- regres_lin(legendre.datos.h2, legendre.y, pesos=TRUE)
 legendre.g10.pesos <- regres_lin(legendre.datos.h10, legendre.y, pesos=TRUE)
 
@@ -596,16 +498,15 @@ legendre.gx.datos <- data.frame(X = legendre.x,
                                 Y10 = legendre.g10.imagen)
 
 ggplot(legendre.gx.datos, aes(x = X)) +
+  ggtitle("Ajuste usando polinomios de Legendre") +
   geom_line(aes(y = Y), colour = "red") +
   geom_line(aes(y = Y2), colour = "blue") +
   geom_line(aes(y = Y10), colour = "green") +
   geom_point(aes(y = M), colour = "coral") +
   coord_cartesian(ylim = c(-10, 10)) 
-```
 
-Veamos el error fuera de la muestra. Cogeremos 1000 muestras nuevas y calcularemos el error cuadrático medio.
-
-```{r MSE}
+print("Ajustes usando polinomios de Legendre")
+## ----MSE-----------------------------------------------------------------
 num_muestras <- 1000
 legendre.test.x <- runif(num_muestras, -1, 1)
 legendre.test.y <- sapply(legendre.test.x, legendre.suma)
@@ -615,25 +516,8 @@ legendre.test.g10 <- sapply(legendre.test.x, legendre.g10.f)
 
 legendre.g2.eout <- sum((legendre.test.y - legendre.test.g2)^2) / num_muestras
 legendre.g10.eout <- sum((legendre.test.y - legendre.test.g10)^2) / num_muestras
-```
 
-Tenemos entonces que $E_{out}(g_2) \approx$ ```r I(legendre.g2.eout*100)``` y $E_{out}(g_{10}) \approx$ ```r I(legendre.g10.eout*100)```. Se ve claramente el sobreajuste que tiene $g_{10}$: el error fuera de la muestra aumenta muchísimo.
-
-Normalizar $f$ se hace para llevar a la misma escala la desviación típica del ruido, $\sigma$, que la propia función $f$, debido a que $\sigma$ es una constante multiplicativa que influye en el ruido de los datos.
-
-Para calcular analíticamente $E_{out}$ debemos calcular esta integral definida:
-
-$$ \int_{\mathcal{D}} g_{10} - f $$
-
-Siendo f la función objetivo sin ruido.
-
-
-## Ejercicio 2
-
-## Ejercicio 3
-
-# Regularización y selección de modelos
-
-## Ejercicio 1
-
-## Ejercicio 2
+print(paste("El MSE de g2 es",legendre.g2.eout))
+print(paste("El MSE de g10 es",legendre.g10.eout))
+pausa()
+graphics.off()
