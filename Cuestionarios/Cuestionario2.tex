@@ -128,7 +128,26 @@
   \end{cuestion}
 
   \begin{solucion}
-    d
+    Resolvamos ambas partes:
+    \begin{enumerate}
+      \item Para ver que H es simétrica, no hay más que ver que es igual a su traspuesta. Hay que tener en cuenta que la traspuesta cambia el orden del producto matricial, además de que sabemos que $\mathrm{X^TX}$ es simétrica.
+
+      $$H^T = \left(\mathrm{X(X^TX)^{-1}X^T} \right) ^T = \mathrm{X^{T^T}} \left( \mathrm{X(X^TX)^{-1}}\right)^T = \mathrm{X(X^TX)^{-T}X^T} = \mathrm{X(X^TX)^{-1}X^T} = H$$
+
+      \item Para ver que $H^K = K \; \forall K \in \mathbb{N}$, lo haremos por inducción.
+
+      \underline{$K = 2$}: Es claro que $H^2=H$:
+
+      $$H^2 = X\underbrace{(X^TX)^{-1}X^TX}_{I}(X^TX)^{-1}X^T = X(X^TX)^{-1}X^T = H$$
+
+      \underline{$K \overset{?}{\Rightarrow} K + 1$}: Suponiendo que es cierto para $K$:
+
+      $$H^{K+1} = H \Leftrightarrow \underbrace{H^K}_{Inducción} H = H \Leftrightarrow H H = H \Leftrightarrow \underbrace{H^2}_{K=2}=H$$
+
+      Lo cual ya hemos demostrado. Así ya lo hemos probado $\forall K \in \mathbb{N}$
+
+    \end{enumerate}
+
   \end{solucion}
 
   \begin{cuestion}
@@ -229,11 +248,30 @@
   \end{solucion}
 
   \begin{bonus}
-    Considerar la matriz $\hat{\mathrm{H}}=\mathrm{X(X^TX)^{-1}X^T}$. Sea $\mathrm{X}$ una matriz  $N\times (d+1)$, y $\mathrm{X^TX}$ invertible. Mostrar que $\mathrm{traza(H)}=d+1$, donde traza significa la suma de los elementos de la diagonal principal. (+1 punto)
+    Considerar la matriz $\hat{\mathrm{H}}=\mathrm{X(X^TX)^{-1}X^T}$. Sea $\mathrm{X}$ una matriz  $N\times (d+1)$, y $\mathrm{X^TX}$ invertible. Mostrar que $\mathrm{traza(\hat{H})}=d+1$, donde traza significa la suma de los elementos de la diagonal principal. (+1 punto)
   \end{bonus}
 
   \begin{solucion}
-    
+    Para resolver esto sólo necesitamos utilizar una propiedad básica de álgebra lineal:
+
+    $$ \mathrm{Traza(AB)}=\mathrm{Traza(BA)}$$
+
+    Utilizando esto, dividimos $\hat{H}$ en dos matrices $A$ y $B$.
+
+    $$A = \mathrm{X(X^TX)^{-1}}$$
+    $$B = \mathrm{X^T}$$
+
+    Es claro que $AB=\hat{H}$. Es claro que $BA$ es la matriz identidad. Lo único que hay que tener cuidado es con las dimensiones de esta matriz.
+
+    $$\mathrm{X} \in \mathcal{M}_{N \times d+1} \Rightarrow \mathrm{X^TX} \in \mathcal{M}_{d+1 \times d+1}$$
+
+    Como una matriz y su inversa tienen la misma dimensión, entonces:
+
+    $$BA=\mathrm{\underbrace{X^TX}_M\underbrace{(X^TX)^{-1}}_{M^{-1}}}=I_{d+1}$$
+
+    Y la traza de esta matriz es $d+1$. Como coincide con la traza de $\hat{H}$, podemos concluir que
+
+    $$\mathrm{traza(\hat{H})}=d+1$$
   \end{solucion}
 
 
