@@ -1,0 +1,272 @@
+\documentclass[a4paper, 11pt]{article}
+
+%Comandos para configurar el idioma
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} %Necesario para el uso de las comillas latinas.
+\usepackage{geometry} % Used to adjust the document margins
+
+%Importante que esta sea la última órden del preámbulo
+\usepackage{hyperref}
+   \hypersetup{
+     pdftitle={Cuestionario de teoría 2},
+     pdfauthor={Antonio Álvarez Caballero},
+     unicode,
+     breaklinks=true,  % so long urls are correctly broken across lines
+     colorlinks=true,
+     urlcolor=blue,
+     linkcolor=darkorange,
+     citecolor=darkgreen,
+     }
+
+   % Slightly bigger margins than the latex defaults
+
+   \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\newcommand\fnurl[2]{%
+  \href{#2}{#1}\footnote{\url{#2}}%
+}
+
+
+%Paquetes matemáticos
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage[all]{xy} %Para diagramas
+\usepackage{enumerate} %Personalización de enumeraciones
+\usepackage{tikz} %Dibujos
+\usepackage{ dsfont }
+
+%Tipografía escalable
+\usepackage{lmodern}
+%Legibilidad
+\usepackage{microtype}
+
+%Código
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{Cuestionario de teoría 2}
+\author{Antonio Álvarez Caballero\\
+    \href{mailto:analca3@correo.ugr.es}{analca3@correo.ugr.es}}
+\date{\today}
+
+\theoremstyle{definition}
+\newtheorem{ejercicio}{Ejercicio}
+\newtheorem{cuestion}{Cuestión}
+\newtheorem*{solucion}{Solución}
+\newtheorem*{bonus}{BONUS}
+
+
+
+%%%%%%%% New sqrt
+\usepackage{letltxmacro}
+\makeatletter
+\let\oldr@@t\r@@t
+\def\r@@t#1#2{%
+\setbox0=\hbox{$\oldr@@t#1{#2\,}$}\dimen0=\ht0
+\advance\dimen0-0.2\ht0
+\setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+{\box0\lower0.4pt\box2}}
+\LetLtxMacro{\oldsqrt}{\sqrt}
+\renewcommand*{\sqrt}[2][\ ]{\oldsqrt[#1]{#2} }
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%% Norm
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%% Ceil
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+  \maketitle
+
+  \section{Cuestiones}
+
+  \begin{cuestion}
+    Sean $x$ e $y$ dos vectores de observaciones de tamaño $N$. Sea
+    \[
+    \mathrm{cov}(x,y)=\frac{1}{N}\sum_{i=1}^N (x_i-\bar{x})(y_i-\bar{y})
+    \]
+    la covarianza de dichos vectores, donde $\bar{z}$ representa el valor medio de los elementos de $z$. Considere ahora una matriz $\mathrm{X}$ cuyas columnas representan vectores de observaciones. La matriz de covarianzas asociada a la matriz $\mathrm{X}$ es el conjunto de covarianzas definidas por cada dos de sus vectores columnas. Defina la expresión matricial que expresa la matriz $\mathrm{cov}(\mathrm{X})$ en función de la matriz $\mathrm{X}$.
+  \end{cuestion}
+
+  \begin{solucion}
+    ss
+  \end{solucion}
+
+  \begin{cuestion}
+    Considerar la matriz hat definida en regresión,  $\mathrm{H}=\mathrm{X(X^TX)^{-1}X^T}$, donde $\mathrm{X}$ es una matriz  $N\times (d+1)$, y $\mathrm{X^TX}$ es invertible.
+    \begin{enumerate}
+        \item Mostrar que H es simétrica
+        \item Mostrar que $\mathrm{H^K=H}$ para cualquier entero K
+    \end{enumerate}
+  \end{cuestion}
+
+  \begin{solucion}
+    d
+  \end{solucion}
+
+  \begin{cuestion}
+    Resolver el siguiente problema: Encontrar el punto $(x_0,y_0)$ sobre la línea $ax+by+d=0$ que este más cerca del punto $(x_1,y_1)$.
+    %
+    \item Consideremos el problema de optimización lineal con restricciones definido por
+    \[
+    \begin{array}{c}
+    \text{Min}_{z} \mathrm{c^Tz} \\
+    \hbox{Sujeto a } \mathrm{Az \leq b}
+    \end{array}
+    \]
+    donde $c$ y $b$ son vectores y A es una matriz.
+
+         \begin{enumerate}
+            \item Para un conjunto de datos linealmente separable mostrar que para algún $w$ se debe de verificar la condición  $\mathrm{y_nw^Tx_n>0 }$ para todo $\mathrm{(x_n,y_n)}$ del conjunto.
+            \item Formular un problema de programación lineal que resuelva el problema de la búsqueda del hiperplano separador. Es decir, identifique quienes son A, \textbf{z}, \textbf{b} y \textbf{c} para este caso.
+        \end{enumerate}
+  \end{cuestion}
+
+  \begin{solucion}
+    d
+  \end{solucion}
+
+  \begin{cuestion}
+    Probar que en el caso general de funciones con ruido se verifica que $\mathbb{E}_{\mathcal{D}}[E_{out}]= \sigma^2+\texttt{\textbf{bias}}+\texttt{\textbf{var}}$ ( ver transparencias de clase).
+
+  \end{cuestion}
+
+  \begin{solucion}
+    cd
+  \end{solucion}
+
+  \begin{cuestion}
+    \item  Consideremos las mismas condiciones generales del enunciado del Ejercicio.2 del apartado de Regresión de la relación de ejercicios.2.
+    Considerar ahora $\sigma=0.1$ y $d=8$, ¿cual es el más pequeño tamaño muestral que resultará en un valor esperado de $E_{in}$ mayor de $0.008$?.
+  \end{cuestion}
+
+
+  \begin{solucion}
+    b
+  \end{solucion}
+
+  \begin{cuestion}
+    En regresión logística mostrar que
+    \[
+    \nabla E_{in}(w)=-\frac{1}{N}\sum_{n=1}^{N}\frac{y_nx_n}{1+e^{y_nw^Tx_n}}= \frac{1}{N}\sum_{n=1}^{N}-y_nx_n\sigma(-y_nw^Tx_n)
+    \]
+
+    Argumentar que un ejemplo mal clasificado contribuye  al gradiente más que un ejemplo bien clasificado.
+  \end{cuestion}
+
+  \begin{solucion}
+    c
+  \end{solucion}
+
+  \begin{cuestion}
+    Definamos el error en un punto $(x_n,y_n)$ por
+      \[
+      e_n(w)=\text{max}(0,-y_nw^Tx_n)
+      \]
+      Argumentar que el algoritmo PLA puede interpretarse como SGD sobre $e_n$ con tasa de aprendizaje $\nu=1$.
+  \end{cuestion}
+
+  \begin{solucion}
+    asdffg
+  \end{solucion}
+
+  \begin{cuestion}
+    El ruido determinista depende de $\mathcal{H}$, ya que algunos modelos aproximan mejor $f$ que otros.
+    \begin{enumerate}
+        \item Suponer que $\mathcal{H}$ es fija y que incrementamos la complejidad de $f$.
+        \item Suponer que $ f$ es fija y decrementamos la complejidad de $\mathcal{H}$
+    \end{enumerate}
+    Contestar para ambos escenarios: ¿En general subirá o bajará el ruido determinista? ¿La tendencia a sobrejaustar será mayor o menor? (Ayuda: analizar los detalles que influencian el sobreajuste)
+  \end{cuestion}
+
+  \begin{solucion}
+    dfasdf
+  \end{solucion}
+
+
+  \begin{cuestion}
+    La técnica de regularización de Tikhonov es bastante general al usar la condición
+    \[
+    wt\mathrm{\Gamma^T\Gamma}w\leq C
+    \]
+    que define relaciones entre las $w_i$ (La matriz $\Gamma_i$ se denomina regularizador de Tikhonov)
+    \begin{enumerate}
+    \item Calcular $\Gamma$ cuando $\sum_{q=0}^Q w_q^2 \leq C$
+    \item Calcular $\Gamma$ cuando $(\sum_{q=0}^Q w_q)^2 \leq C$
+    \end{enumerate}
+    Argumentar si el estudio de los regularizadores de Tikhonov puede hacerse a través de las propiedades algebraicas de las matrices $\Gamma$.
+  \end{cuestion}
+
+  \begin{solucion}
+    asdf
+  \end{solucion}
+
+  \begin{bonus}
+    Considerar la matriz $\hat{\mathrm{H}}=\mathrm{X(X^TX)^{-1}X^T}$. Sea $\mathrm{X}$ una matriz  $N\times (d+1)$, y $\mathrm{X^TX}$ invertible. Mostrar que $\mathrm{traza(H)}=d+1$, donde traza significa la suma de los elementos de la diagonal principal. (+1 punto)
+  \end{bonus}
+
+  \begin{solucion}
+    
+  \end{solucion}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
