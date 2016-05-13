@@ -216,7 +216,17 @@
   \end{cuestion}
 
   \begin{solucion}
-    c
+    Partimos de la expresión de $E_{in}$ conocida:
+
+    $$E_{in}(w) = \frac{1}{N} \sum_{n=0}^{N}\ln \left(1 + e^{-y_iw^Tx_i} \right) $$
+
+    Ahora sólo calculamos su gradiente con respecto a $w$, por lo que coincide con su parcial con $w$.
+
+    $$\nabla E_{in}(w)=\frac{\partial}{\partial x} \left( \frac{1}{N} \sum_{n=0}^{N}\ln \left(1 + e^{-y_iw^Tx_i} \right) \right) = \frac{1}{N}\sum_{n=1}^{N}\frac{-y_nx_ne^{-y_nw^Tx_n}}{1+e^{-y_nw^Tx_n}} = \frac{1}{N}\sum_{n=1}^{N}\frac{-y_nx_n}{1+e^{y_nw^Tx_n}} $$
+
+    $$\nabla E_{in}(w)=-\frac{1}{N}\sum_{n=1}^{N}\frac{y_nx_n}{1+e^{y_nw^Tx_n}} = \frac{1}{N}\sum_{n=1}^{N}-y_nx_n\sigma(-y_nw^Tx_n)$$
+
+    Es claro que una solución mal clasificada influye más que una buena. Una solución bien clasificada equivale a $y_nw^Tx_n > 0$, luego la exponencial del denominador será mayor que 1. Al dividir por algo más grande, el cociente se hace más pequeño. En el caso de $y_nw^Tx_n < 0$, la exponencial será una exponencial negativa, con valores menores a 1. Luego el denominador será más pequeño, y el cociente más grande. Luego la sumatoria será más grande.
   \end{solucion}
 
   \begin{cuestion}
@@ -248,7 +258,7 @@
   \begin{cuestion}
     La técnica de regularización de Tikhonov es bastante general al usar la condición
     \[
-    wt\mathrm{\Gamma^T\Gamma}w\leq C
+    w^T\mathrm{\Gamma^T\Gamma}w\leq C
     \]
     que define relaciones entre las $w_i$ (La matriz $\Gamma_i$ se denomina regularizador de Tikhonov)
     \begin{enumerate}
