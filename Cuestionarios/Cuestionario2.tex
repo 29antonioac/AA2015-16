@@ -152,8 +152,15 @@
 
   \begin{cuestion}
     Resolver el siguiente problema: Encontrar el punto $(x_0,y_0)$ sobre la línea $ax+by+d=0$ que este más cerca del punto $(x_1,y_1)$.
-    %
-    \item Consideremos el problema de optimización lineal con restricciones definido por
+
+  \end{cuestion}
+
+  \begin{solucion}
+    d
+  \end{solucion}
+
+  \begin{cuestion}
+    Consideremos el problema de optimización lineal con restricciones definido por
     \[
     \begin{array}{c}
     \text{Min}_{z} \mathrm{c^Tz} \\
@@ -182,13 +189,21 @@
   \end{solucion}
 
   \begin{cuestion}
-    \item  Consideremos las mismas condiciones generales del enunciado del Ejercicio.2 del apartado de Regresión de la relación de ejercicios.2.
+    Consideremos las mismas condiciones generales del enunciado del Ejercicio.2 del apartado de Regresión de la relación de ejercicios.2.
     Considerar ahora $\sigma=0.1$ y $d=8$, ¿cual es el más pequeño tamaño muestral que resultará en un valor esperado de $E_{in}$ mayor de $0.008$?.
   \end{cuestion}
 
 
   \begin{solucion}
-    b
+    Conociendo la expresión del valor esperado del $E_{in}$ y acotándolo inferiormente por $0.008$:
+
+    $$E_{\mathcal{D}} \left[ E_{in}(w_{lim})\right] = \sigma^2 \left(1 - \frac{d+1}{N}\right) \geq 0.008$$
+
+    Ahora sólo sustituimos los valores que nos han dado y despejamos el tamaño de la muestra $N$.
+
+    $$0.1^2 \left(1 - \frac{9}{N}\right) \geq 0.008 \Rightarrow \left(1 - \frac{9}{N}\right) \geq 0.8 \Rightarrow -\frac{9}{N} \geq -0.2 \Rightarrow \frac{9}{0.2} \leq N \Rightarrow 45 \leq N$$
+
+    Así, el mínimo $N$ para que el valor esperado de $E_{in}$ sea $0.008$ es $45$.
   \end{solucion}
 
   \begin{cuestion}
