@@ -238,7 +238,21 @@
   \end{cuestion}
 
   \begin{solucion}
-    asdffg
+    Recordamos que la función de actualización de los pesos para el SGD es
+
+    $$ w = w - \eta \cdot \nabla e_n(w) $$
+
+    Además, la función de error está bien definida. Si un dato está mal clasificado, $y_iw^Tx_i > 0$, por lo cual el máximo de 0 y $-y_iw^Tx_i$ es 0. En caso de estar mal clasificado, el máximo es dicho valor.
+
+    Vamos a calcular el gradiente del error y veamos qué sale.
+
+    $$ \nabla e_n(w) = \frac{\partial}{\partial w} \left( max(0, -y_nw^Tx_n) \right) = max(0, -y_nx_n) $$
+
+    Entonces, para datos mal clasificados, la función de actualización de los pesos es:
+
+    $$ w = w - \eta \cdot (-y_nx_n) \Rightarrow w = w + 1 \cdot y_nx_n $$
+
+    Que es justo la fórmula para actualizar pesos en el PLA.
   \end{solucion}
 
   \begin{cuestion}
