@@ -234,7 +234,7 @@
       \[
       e_n(w)=\text{max}(0,-y_nw^Tx_n)
       \]
-      Argumentar que el algoritmo PLA puede interpretarse como SGD sobre $e_n$ con tasa de aprendizaje $\nu=1$.
+      Argumentar que el algoritmo PLA puede interpretarse como SGD sobre $e_n$ con tasa de aprendizaje $\eta=1$.
   \end{cuestion}
 
   \begin{solucion}
@@ -250,7 +250,7 @@
 
     Entonces, para datos mal clasificados, la función de actualización de los pesos es:
 
-    $$ w = w - \eta \cdot (-y_nx_n) \Rightarrow w = w + 1 \cdot y_nx_n $$
+    $$ w = w - \eta \cdot (-y_nx_n) \overset{\eta=1}{\Rightarrow} w = w + 1 \cdot y_nx_n $$
 
     Que es justo la fórmula para actualizar pesos en el PLA.
   \end{solucion}
