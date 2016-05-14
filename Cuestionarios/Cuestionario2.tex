@@ -199,11 +199,22 @@
 
     $$ \mathbb{E}_x \left[\mathbb{E}_{\mathcal{D}} \left[ g^D(x)^2 - \bar{g}(x)^2 + \bar{g}(x)^2 + f(x)^2 + \epsilon(x)^2 - 2f(x)g^D(x) - 2g^D(x)\epsilon(x) - 2f(x)\epsilon(x) \right] \right] $$
 
-    Usamos la linealidad de la esperanza y reordenamos para obtener dichas expresiones.
+    Usamos la linealidad de la esperanza y reordenamos para obtener dichas expresiones. La varianza es la indicada porque el doble producto de que debe salir del binomio al cuadrado es $0$, ya que $\bar{g}(x)$ no depende de $\mathcal{D}$.
 
-    $$ \mathbb{E}_x \left[\mathbb{E}_{\mathcal{D}} \left[ g^D(x)^2 \right] - \bar{g}(x)^2 + \bar{g}(x)^2 - \mathbb{E}_{\mathcal{D}}  \left[ 2f(x)g^D(x) \right] + f(x)^2 - \mathbb{E}_{\mathcal{D}} \left[ g^D(x)\epsilon(x) \right] - 2f(x)\epsilon(x) + \epsilon(x)^2 \right] $$
+    $$ \mathbb{E}_x \left[ \underbrace{\mathbb{E}_{\mathcal{D}} \left[ g^D(x)^2 \right] - \bar{g}(x)^2}_{var(x)} + \underbrace{\bar{g}(x)^2 - 2f(x) \underbrace{\mathbb{E}_{\mathcal{D}}  \left[g^D(x) \right]}_{\bar{g}(x)} + f(x)^2}_{bias(x)} - 2\epsilon(x) \underbrace{\mathbb{E}_{\mathcal{D}}  \left[g^D(x) \right]}_{\bar{g}(x)} - 2f(x)\epsilon(x) + \epsilon(x)^2 \right] $$
 
-    
+    Entonces nos queda
+
+    $$ \mathbb{E}_{\mathcal{D}}[E_{out}(g^D(x))] = \mathbb{E}_x \left[var(x) + bias(x) - 2 \epsilon(x) \bar{g}(x) - 2f(x)\epsilon(x) + \epsilon(x)^2 \right] $$
+
+    Ahora usamos de nuevo la linealidad de la esperanza. Además, destacar que $f(x)$ y $\epsilon(x)$ son independientes, luego la esperanza del producto es el producto de las esperanzas.
+
+    $$ \mathbb{E}_{\mathcal{D}}[E_{out}(g^D(x))] = var + bias -2 \underbrace{\mathbb{E}_x \left[ \epsilon(x) \right]}_{0} \mathbb{E}_x \left[\bar{g}(x) \right] - 2 \mathbb{E}_x \left[ f(x) \right] \underbrace{\mathbb{E}_x \left[ \epsilon(x) \right]}_{0} + \underbrace{\mathbb{E}_x \left[\epsilon(x)^2 \right]}_{\sigma^2} $$
+
+    Con esto, ya lo tenemos: por hipótesis, sabemos que la media del ruido es 0 y la varianza $\sigma^2$, luego nos queda la expresión que buscábamos:
+
+    $$ \mathbb{E}_{\mathcal{D}}[E_{out}(g^D(x))] = var + bias + \sigma^2 $$
+
 
 
   \end{solucion}
