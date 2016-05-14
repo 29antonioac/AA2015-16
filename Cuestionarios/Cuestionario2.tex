@@ -180,24 +180,43 @@
   \end{solucion}
 
   \begin{cuestion}
-    Probar que en el caso general de funciones con ruido se verifica que $\mathbb{E}_{\mathcal{D}}[E_{out}]= \sigma^2+\texttt{\textbf{bias}}+\texttt{\textbf{var}}$ ( ver transparencias de clase).
+    Probar que en el caso general de funciones con ruido se verifica que $\mathbb{E}_{\mathcal{D}}[E_{out}]= \sigma^2+\texttt{\textbf{bias}}+\texttt{\textbf{var}}$ (ver transparencias de clase).
 
   \end{cuestion}
 
   \begin{solucion}
-    cd
+    Nuestro problema se reduce a calcular, tal como se hizo en clase, la expresión $\mathbb{E}_{\mathcal{D}}[E_{out}(g^D(x))]$, donde la función objetivo $f$ tiene ruido. Suponemos, como siempre, que el ruido $\epsilon$ tiene media 0 y varianza $\sigma^2$.
+
+    $$\mathbb{E}_{\mathcal{D}}\left[E_{out}\left(g^D(x)\right) \right] = \mathbb{E}_{\mathcal{D}} \left[\mathbb{E}_x \left[ \left(g^D(x) - y(x) \right)^ 2  \right] \right] = \mathbb{E}_{\mathcal{D}} \left[\mathbb{E}_x \left[ \left(g^D(x) - f(x) - \epsilon(x) \right)^ 2  \right] \right] $$
+
+    $$ \mathbb{E}_{\mathcal{D}} \left[\mathbb{E}_x \left[ \left(g^D(x) - f(x) - \epsilon(x) \right)^ 2  \right] \right] = \mathbb{E}_x \left[\mathbb{E}_{\mathcal{D}} \left[ \left(g^D(x) - f(x) - \epsilon(x) \right)^ 2  \right] \right] $$
+
+    Desarrollando el trinomio queda:
+
+    $$ \mathbb{E}_x \left[\mathbb{E}_{\mathcal{D}} \left[ g^D(x)^2 + f(x)^2 + \epsilon(x)^2 - 2f(x)g^D(x) - 2g^D(x)\epsilon(x) - 2f(x)\epsilon(x) \right] \right]  $$
+
+    Ahora sumamos y restamos $\bar{g}(x)^2$ para obtener las expresiones para $bias(x)$ y $var(x)$.
+
+    $$ \mathbb{E}_x \left[\mathbb{E}_{\mathcal{D}} \left[ g^D(x)^2 - \bar{g}(x)^2 + \bar{g}(x)^2 + f(x)^2 + \epsilon(x)^2 - 2f(x)g^D(x) - 2g^D(x)\epsilon(x) - 2f(x)\epsilon(x) \right] \right] $$
+
+    Usamos la linealidad de la esperanza y reordenamos para obtener dichas expresiones.
+
+    $$ \mathbb{E}_x \left[\mathbb{E}_{\mathcal{D}} \left[ g^D(x)^2 \right] - \bar{g}(x)^2 + \bar{g}(x)^2 - \mathbb{E}_{\mathcal{D}}  \left[ 2f(x)g^D(x) \right] + f(x)^2 - \mathbb{E}_{\mathcal{D}} \left[ g^D(x)\epsilon(x) \right] - 2f(x)\epsilon(x) + \epsilon(x)^2 \right] $$
+
+    
+
+
   \end{solucion}
 
   \begin{cuestion}
-    Consideremos las mismas condiciones generales del enunciado del Ejercicio.2 del apartado de Regresión de la relación de ejercicios.2.
-    Considerar ahora $\sigma=0.1$ y $d=8$, ¿cual es el más pequeño tamaño muestral que resultará en un valor esperado de $E_{in}$ mayor de $0.008$?.
+    Consideremos las mismas condiciones generales del enunciado del Ejercicio.2 del apartado de Regresión de la relación de ejercicios.2. Considerar ahora $\sigma=0.1$ y $d=8$, ¿cual es el más pequeño tamaño muestral que resultará en un valor esperado de $E_{in}$ mayor de $0.008$?.
   \end{cuestion}
 
 
   \begin{solucion}
     Conociendo la expresión del valor esperado del $E_{in}$ y acotándolo inferiormente por $0.008$:
 
-    $$E_{\mathcal{D}} \left[ E_{in}(w_{lim})\right] = \sigma^2 \left(1 - \frac{d+1}{N}\right) \geq 0.008$$
+    $$\mathbb{E}_{\mathcal{D}} \left[ E_{in}(w_{lim})\right] = \sigma^2 \left(1 - \frac{d+1}{N}\right) \geq 0.008$$
 
     Ahora sólo sustituimos los valores que nos han dado y despejamos el tamaño de la muestra $N$.
 
