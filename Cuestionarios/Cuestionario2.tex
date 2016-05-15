@@ -116,7 +116,25 @@
   \end{cuestion}
 
   \begin{solucion}
-    ss
+    Se define la matriz de covarianzas $(cov(X))_{ij}$ por componentes usando la definición de covarianza $cov(x,y)$ arriba indicada como:
+
+    \[
+      (cov(X))_{ij} = cov(X_i, X_j)
+    \]
+
+    con $X_i$ la i-ésima columna de la matriz $X$.
+
+    Usando la igualdad $\sum_{i=1}^n(x_i-\bar{x})^2 = \sum_{i=1}^n x_i^2 - n \bar{x}^2$ de Statistical Inference de Casella y Berger (Teorema 5.2.4) es fácil ver:
+
+    $$ cov(X_i, X_j) = \mathbb{E}[X_iX_j^T] - \mathbb{E}[X_i]\mathbb{E}[X_j] $$
+
+    Utilizando esta expresión, es directo ver que estas son las componentes de la matriz $ \mathbb{E}[XX^T] - \mathbb{E}[X]\mathbb{E}[X^T] $, esto es:
+
+    $$ (\mathbb{E}[XX^T] - \mathbb{E}[X]\mathbb{E}[X^T])_{ij} =  \mathbb{E}[X_iX_j] - \mathbb{E}[X_i]\mathbb{E}[X_j] $$
+
+    Luego la expresión para la matriz de covarianzas es:
+
+    $$ cov(X) = \mathbb{E}[XX^T] - \mathbb{E}[X]\mathbb{E}[X] $$
   \end{solucion}
 
   \begin{cuestion}
@@ -210,8 +228,9 @@
   \end{cuestion}
 
   \begin{solucion}
+    Resolvemos por partes:
     \begin{enumerate}
-      \item La condición $y_nw^Tx_n>0$ quiere decir que el dato $(x_n,y_n)$ está bien clasificado, como ya sabemos para clasificación binaria. Entonces, demostramos por contrarrecíproco: Si no existe $w$ que cumpla $\forall (x_n,y_n) y_nw^Tx_n>0$, eso quiere decir que no clasifica bien todos los datos, luego el conjunto no puede ser linealmente separable.
+      \item La condición $y_nw^Tx_n>0$ quiere decir que el dato $(x_n,y_n)$ está bien clasificado, como ya sabemos para clasificación binaria. Entonces, demostramos por contrarrecíproco ($ \left( a \Rightarrow b \right) \Leftrightarrow \left( \neg b \Rightarrow \neg a \right) $): Si no existe $w$ que cumpla $\forall (x_n,y_n) \; y_nw^Tx_n>0$, eso quiere decir que no clasifica bien todos los datos, luego el conjunto no es linealmente separable.
     \end{enumerate}
   \end{solucion}
 
@@ -325,13 +344,21 @@
     El ruido determinista depende de $\mathcal{H}$, ya que algunos modelos aproximan mejor $f$ que otros.
     \begin{enumerate}
         \item Suponer que $\mathcal{H}$ es fija y que incrementamos la complejidad de $f$.
-        \item Suponer que $ f$ es fija y decrementamos la complejidad de $\mathcal{H}$
+        \item Suponer que $f$ es fija y decrementamos la complejidad de $\mathcal{H}$
     \end{enumerate}
     Contestar para ambos escenarios: ¿En general subirá o bajará el ruido determinista? ¿La tendencia a sobrejaustar será mayor o menor? (Ayuda: analizar los detalles que influencian el sobreajuste)
   \end{cuestion}
 
   \begin{solucion}
-    dfasdf
+    Analizamos por partes:
+    \begin{enumerate}
+      \item El ruido determinista está directamente determinado por $\mathcal{H}$, ya que es la parte que no ajustamos bien de $f$. Si incrementamos la complejidad de $f$, el ruido determinista aumentará, ya que al aumentar la complejidad de la función objetivo manteniendo nuestro espacio de hipótesis, cada vez ajustaremos peor. Luego la diferencia entre la función objetivo (cuya complejidad va aumentando) y nuestra función estimada, que pertenece a $\mathcal{H}$ (que dejamos fijo) será cada vez mayor.
+
+      Acerca del sobreajuste, la tendencia será a sobreajustar más. Esto se debe a que se intentará aprender todo lo posible de $f$, sin poder determinar si algunos datos son ruido o no. 
+      \item En este caso también va a subir el ruido determinista. Porque la $f$ es fija, pero al quitar complejidad a $\mathcal{H}$ cada vez podremos ajustar peor cada uno de los datos de la muestra, teniendo un ajuste peor de $f$ y por tanto más ruido determinista.
+
+      Acerca del sobreajuste, la tendencia será a sobreajustar menos. Al decrementar la complejidad de $\mathcal{H}$ estamos ajustando peor cada uno de los puntos de la muestra, como ya hemos comentado. Al no poder focalizar sobre cada uno de los puntos individualmente, el sobreajuste baja, aunque cada vez ajustará peor la función objetivo.
+    \end{enumerate}
   \end{solucion}
 
 
@@ -349,7 +376,46 @@
   \end{cuestion}
 
   \begin{solucion}
-    asdf
+    Veamos ambos casos:
+    \begin{enumerate}
+      \item En este caso $\Gamma$ debe ser cualquier matriz ortogonal, es decir, que cumpla que su inversa coincide con su traspuesta.
+      \item En este caso es un poco más complicado. Vamos a intentar sacarlo para un caso pequeño, $Q=3$. Para este caso, debemos buscar una matriz $\Gamma$ que haga cumplir la condición
+
+      $$ (w_1 + w_2 + w_3)^2 \leq C $$
+
+      Por tanto, debemos buscar $\Gamma$ que haga que $w^T \Gamma^T = w_1 + w_2 + w_3 = \Gamma w$ en alguna de sus componentes (necesariamente la misma, para que al realizar el producto escalar consigo misma dé dicho resultado al cuadrado). Sabemos que $w$ es columna y por tanto $w^T$ fila. Entonces es claro que
+
+      \[
+      \Gamma w = (w_1 + w_2 + w_3, 0, 0) \Leftrightarrow \Gamma = \begin{pmatrix}
+                                                                    1 & 1 & 1 \\
+                                                                    0 & 0 & 0 \\
+                                                                    0 & 0 & 0
+                                                                    \end{pmatrix}
+      \]
+
+      Para el otro caso, $w^T \Gamma^T$, veamos si pasa lo mismo.
+
+      \[
+      w^T \Gamma^T = (w_1, w_2, w_3) \cdot  \begin{pmatrix}
+                                            1 & 0 & 0 \\
+                                            1 & 0 & 0 \\
+                                            1 & 0 & 0
+                                            \end{pmatrix}  = (w_1 + w_2 + w_3, 0, 0)
+      \]
+
+      Entonces nos queda que
+
+      \[
+        w^T \Gamma^T \Gamma w = (w_1 + w_2 + w_3, 0, 0) \cdot \begin{pmatrix}
+                                  w_1 + w_2 + w_3 \\
+                                  0  \\
+                                  0
+                                  \end{pmatrix} = (w_1 + w_2 + w_3)^2
+      \]
+
+      Que es justo lo que queríamos. Para el caso general, es exactamente igual, tomando vectores y matrices cuadradas de dimensión $Q$ en vez de $3$.
+
+    \end{enumerate}
   \end{solucion}
 
   \begin{bonus}
