@@ -29,7 +29,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Ejercicio 1
 
-```{r Auto, include = FALSE}
+```{r Auto, echo = FALSE}
 attach(Auto)
 pairs(Auto)
 ```
@@ -49,6 +49,8 @@ ggplot(Auto, aes(x=weight,y=mpg)) + geom_boxplot(aes(group = cut_width(weight,0.
 # ggplot(Auto, aes(x=origin,y=mpg)) + geom_boxplot(aes(group = cut_width(origin,0.25)))
 # ggplot(Auto, aes(x=name,y=mpg)) + geom_boxplot(aes(group = cut_width(name,0.25)))
 ```
+
+Es claro que existe una dependencia entre estas variables. Además, con el primer plot podemos ver las correlaciones entre estas 3 variables, que es alta.
 
 ## Apartado b)
 
@@ -86,12 +88,14 @@ Vamos a ajustar un modelo de regresión logística para predecir _mpg01_.
 
 ```{r regLog}
 model.LogReg <- glm(mpg01 ~ ., data = Auto.train, family = binomial)
-prediction.LogReg <- predict(model.LogReg, newdata = Auto.test)
-prediction.LogReg
-error.test <- "¿Esto cómo va?"
+prediction.LogReg <- predict(model.LogReg, newdata = Auto.test, type = "response")
+prediction.LogReg.labels <- ifelse(prediction.LogReg > 0.5, 1, 0)
+error.test <- "¿Esto cómo es?"
+error.test <- sum(sign(prediction.LogReg.labels) != sign(Auto.test$mpg01)) / 
+                                                  length(prediction.LogReg.labels)
 ```
 
-El error de test de este modelo es ```r I(error.test)```.
+El error de test de este modelo es ```r I(error.test*100)```.
 
 ### Apartado d2)
 
@@ -141,7 +145,7 @@ cv.LogReg <- cv.glm(data = Auto.selected, glmfit = model.full.LogReg, K = 5)
 cv.LogReg$delta
 ```
 
-El error estimado es el primero de este vector. El segundo es un ajusto para compenar el sesgo introducido al no usar *Leave-One-Out*.
+El error estimado es el primero de este vector. El segundo es un ajuste para compensar el sesgo introducido al no usar *Leave-One-Out*.
 
 Para el caso del k-NN
 
@@ -163,6 +167,7 @@ Ajustamos con validación cruzada sobre la variable _crim_, que es la que está 
 
 ```{r boston}
 attach(Boston)
+set.seed(123456789)
 
 index <- sample(nrow(Boston), 0.8*nrow(Boston))
 Boston.full <- Boston
@@ -206,23 +211,20 @@ Ahora ajustamos varias _SVM_, probaremos la lineal y con los núcleos disponible
 ```{r SVM}
 svm.linear <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "linear")
 svm.linear.prediction <- predict(svm.linear, newdata = Boston.test.crim1[,-1])
-# confusionMatrix(svm.linear.prediction, Boston.test$crim1)
-svm.linear.prediction
+confusionMatrix(sign(svm.linear.prediction), Boston.test.crim1$crim1)
 
 svm.polynomial <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "polynomial")
 svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test.crim1[,-1])
-# confusionMatrix(svm.polynomial.prediction, Boston.test$crim1)
-svm.polynomial.prediction
+confusionMatrix(sign(svm.polynomial.prediction), Boston.test.crim1$crim1)
 
 svm.radial <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "radial")
 svm.radial.prediction <- predict(svm.radial, newdata = Boston.test.crim1[,-1])
-# confusionMatrix(svm.radial.prediction, Boston.test$crim1)
-svm.radial.prediction
+confusionMatrix(sign(svm.radial.prediction), Boston.test.crim1$crim1)
 
 svm.sigmoid <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "sigmoid")
 svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test.crim1[,-1])
-# confusionMatrix(svm.sigmoid.prediction, Boston.test$crim1)
-svm.sigmoid.prediction
+confusionMatrix(sign(svm.sigmoid.prediction), Boston.test.crim1$crim1)
+
 ```
 
 Analizar el error.
@@ -236,7 +238,7 @@ Ajustamos con validación cruzada sobre la variable _crim_.
 cv.Boston <- cv.glmnet(as.matrix(Boston[,-1]), Boston[,1], nfolds = 5, alpha = 1)
 ```
 
-El error de validación cruzada (respondiendo al Bonus-3) es 
+El error de validación cruzada es 
 
 ```{r}
 cv.Boston$cvm
@@ -292,8 +294,9 @@ La diferencia con bagging y randomForest es...
 
 # Ejercicio 4
 
-```{r OJ}
+```{r OJ, include = FALSE}
 attach(OJ)
+set.seed(123456789)
 ```
 
 ## Apartado a)
@@ -357,3 +360,20 @@ model.cv.tree
 
 ## Apartado f) (Bonus-4)
 
+```{r plotcvTree}
+error.tree <- data.frame(size = model.cv.tree$size,
+                         error = model.cv.tree$dev)
+
+error.tree$alpha <- ifelse(error.tree$error == min(error.tree$error), 1, 0)
+
+ggplot(error.tree, aes(x=size,y=error)) + geom_line() +
+  geom_point(aes(colour = "Mínimo", alpha = alpha )) +
+  scale_x_continuous(breaks = error.tree$size) +
+  guides(alpha=FALSE) +
+  theme(legend.title = element_blank()) + 
+  labs(title = "Cross Validation error", 
+       x = "Size",
+       y = "Error")
+```
+
+Podemos ver que el mínimo de error se alcanza en ```r I(error.tree$size[which(error.tree$alpha == 1)])```.
