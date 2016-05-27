@@ -1,0 +1,58 @@
+---
+title: "Trabajo 3"
+author: "Antonio Álvarez Caballero"
+date: "27 de mayo de 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+require(ISLR)
+require(ggplot2)
+require(plotly)
+require(reshape)
+require(GGally)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Ejercicio 1
+
+```{r Auto, include = FALSE}
+attach(Auto)
+pairs(Auto)
+```
+
+## Apartado a)
+
+Parece ser que las variables de las que más depende mpg son displacement, horsepower y weight. Veámoslas con más detalle.
+
+```{r plots, echo = FALSE, cache = TRUE}
+ggpairs(Auto, columns =  c("mpg","displacement", "horsepower", "weight"))
+# ggplot(Auto, aes(x=cylinders,y=mpg)) + geom_boxplot(aes(group = cut_width(cylinders,0.25)))
+ggplot(Auto, aes(x=displacement,y=mpg)) + geom_boxplot(aes(group = cut_width(displacement,0.25)))
+ggplot(Auto, aes(x=horsepower,y=mpg)) + geom_boxplot(aes(group = cut_width(horsepower,0.25)))
+ggplot(Auto, aes(x=weight,y=mpg)) + geom_boxplot(aes(group = cut_width(weight,0.25)))
+# ggplot(Auto, aes(x=acceleration,y=mpg)) + geom_boxplot(aes(group = cut_width(acceleration,0.25)))
+# ggplot(Auto, aes(x=year,y=mpg)) + geom_boxplot(aes(group = cut_width(year,0.25)))
+# ggplot(Auto, aes(x=origin,y=mpg)) + geom_boxplot(aes(group = cut_width(origin,0.25)))
+# ggplot(Auto, aes(x=name,y=mpg)) + geom_boxplot(aes(group = cut_width(name,0.25)))
+```
+
+## Apartado b)
+
+Seleccionamos las variables que hemos decidido para predecir.
+
+```{r selection}
+data <- Auto[,c("mpg","displacement","horsepower","weight")]
+```
+
+## Apartado c)
+
+Como nuestro conjunto de datos es grande (```r I(nrow(Auto))``` instancias), podemos realizar un muestreo aleatorio. Así tampoco falseamos las muestras, cosa que podría pasarnos si realizamos un muestreo estratificado.
+
+```{r split}
+index <- sample(nrow(Auto), size = 0.8*nrow(Auto) )
+
+Auto.train <- Auto[index,]
+Auto.test <- Auto[-index,]
+```
+
