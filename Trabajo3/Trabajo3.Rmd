@@ -254,7 +254,7 @@ Ya tenemos cargado y separado el conjunto de datos en 80% training y 20% test.
 Vamos a ajusar un modelo de Bagging. Para ello usaremos el RandomForest y le diremos que use el total de características disponibles.
 
 ```{r bagging}
-bagging <- randomForest(medv ~., data = Boston.full, subset = -index, mtray = ncol(Boston)-1, importance = TRUE)
+bagging <- randomForest(medv ~., data = Boston, subset = -index, mtray = ncol(Boston)-1, importance = TRUE)
 bagging.prediction <- predict(bagging, newdata = Boston.test)
 bagging.error <- "¿Esto cómo es?"
 ```
@@ -266,7 +266,7 @@ El error de test del modelo bagging es ```r I(bagging.error)```.
 Ahora vamos a ajustar un RandomForest.
 
 ```{r randomForest}
-randomFor <- randomForest(medv ~., data = Boston.full, subset = -index, importance = TRUE)
+randomFor <- randomForest(medv ~., data = Boston, subset = -index, importance = TRUE)
 
 randomFor.error <- "¿Esto cómo es?"
 ```
@@ -281,7 +281,7 @@ Ajustamos un modelo de regresión con Boosting.
 
 ```{r boosting}
 boosting <- gbm(medv~., data = Boston.train, distribution = "gaussian")
-pred <- predict(boosting, Boston.test, n.trees = 150)
+pred <- predict(boosting, Boston.test, n.trees = 100)
 boosting.error <- "¿Esto cómo es?"
 ```
 
