@@ -66,7 +66,7 @@ Auto.test <- Auto.selected[-index,]
 Vamos a crear una nueva variable, _mpg01_, la cual tendrá 1 si el valor de _mpg_ está por encima de la mediana y -1 en otro caso.
 
 ```{r mpg01}
-mpg01 <- ifelse(Auto$mpg >= median(Auto$mpg), 1, -1)
+mpg01 <- ifelse(Auto$mpg >= median(Auto$mpg), 1, 0)
 Auto.selected$mpg01 <- mpg01
 Auto.train$mpg01 <- mpg01[index]
 Auto.test$mpg01 <- mpg01[-index]
@@ -77,7 +77,7 @@ Auto.test$mpg01 <- mpg01[-index]
 Vamos a ajustar un modelo de regresión logística para predecir _mpg01_.
 
 ```{r regLog}
-model.LogReg <- glm(mpg01 ~ ., data = Auto.train)
+model.LogReg <- glm(mpg01 ~ ., data = Auto.train, family = binomial)
 prediction.LogReg <- predict(model.LogReg, newdata = Auto.test)
 prediction.LogReg
 error.test <- "¿Esto cómo va?"
