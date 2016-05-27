@@ -5,7 +5,7 @@ Trabajo1/*.tex
 *files/
 
 Practica1/.Rhistory
-
+*cache*
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
