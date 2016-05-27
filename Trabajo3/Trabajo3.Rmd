@@ -20,6 +20,7 @@ require(e1071)
 require(caret)
 require(randomForest)
 require(gbm)
+require(tree)
 require(knitr)
 
 set.seed(123456789)
@@ -290,3 +291,69 @@ El error de test es ```r I(boosting.error)```.
 La diferencia con bagging y randomForest es...
 
 # Ejercicio 4
+
+```{r OJ}
+attach(OJ)
+```
+
+## Apartado a)
+
+Cogemos una muestra aleatoria de 800 elementos y lo usamos como training.
+
+```{r OJsplit}
+index <- sample(nrow(OJ), 800)
+OJ.train <- OJ[index,]
+OJ.test <- OJ[-index,]
+```
+
+Ajustamos un árbol con la variable _Purchase_ como objetivo.
+
+```{r tree}
+model.tree <- tree(Purchase ~ ., data = OJ.train)
+```
+
+
+## Apartado b)
+
+Veamos un resumen del árbol.
+
+```{r summaryTree}
+summary(model.tree)
+```
+
+El número de nodos terminales es de 8, y tiene un error del 16.38%. Completar.
+
+## Apartado c)
+
+Dibujamos el árbol obtenido.
+
+```{r plotTree}
+plot(model.tree, main="Classification tree")
+text(model.tree, all=TRUE, cex=.8)
+```
+
+Interpretar.
+
+## Apartado d)
+
+Aplicamos el árbol a nuestros datos de test.
+
+```{r testTree}
+prediction.tree <- predict(model.tree, OJ.test)
+prediction.tree
+```
+
+Valorar resultados.
+
+## Apartado e)
+
+Aplicamos la función cv.tree() a los datos de training y veamos qué hace.
+
+```{r cvTree}
+model.cv.tree <- cv.tree(model.tree, K = 5)
+model.cv.tree
+```
+
+
+## Apartado f) (Bonus-4)
+
