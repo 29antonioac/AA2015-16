@@ -11,6 +11,11 @@ require(ggplot2)
 require(plotly)
 require(reshape)
 require(GGally)
+require(ROCR)
+require(MESS)
+require(boot)
+
+set.seed(123456789)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -23,7 +28,7 @@ pairs(Auto)
 
 ## Apartado a)
 
-Parece ser que las variables de las que más depende mpg son displacement, horsepower y weight. Veámoslas con más detalle.
+Parece ser que las variables de las que más depende _mpg_ son _displacement_, _horsepower_ y _weight_. Veámoslas con más detalle.
 
 ```{r plots, echo = FALSE, cache = TRUE}
 ggpairs(Auto, columns =  c("mpg","displacement", "horsepower", "weight"))
@@ -42,7 +47,7 @@ ggplot(Auto, aes(x=weight,y=mpg)) + geom_boxplot(aes(group = cut_width(weight,0.
 Seleccionamos las variables que hemos decidido para predecir.
 
 ```{r selection}
-data <- Auto[,c("mpg","displacement","horsepower","weight")]
+Auto.selected <- Auto[,c("displacement","horsepower","weight")]
 ```
 
 ## Apartado c)
@@ -52,7 +57,92 @@ Como nuestro conjunto de datos es grande (```r I(nrow(Auto))``` instancias), pod
 ```{r split}
 index <- sample(nrow(Auto), size = 0.8*nrow(Auto) )
 
-Auto.train <- Auto[index,]
-Auto.test <- Auto[-index,]
+Auto.train <- Auto.selected[index,]
+Auto.test <- Auto.selected[-index,]
 ```
+
+## Apartado d)
+
+Vamos a crear una nueva variable, _mpg01_, la cual tendrá 1 si el valor de _mpg_ está por encima de la mediana y -1 en otro caso.
+
+```{r mpg01}
+mpg01 <- ifelse(Auto$mpg >= median(Auto$mpg), 1, -1)
+Auto.selected$mpg01 <- mpg01
+Auto.train$mpg01 <- mpg01[index]
+Auto.test$mpg01 <- mpg01[-index]
+```
+
+### Apartado d1)
+
+Vamos a ajustar un modelo de regresión logística para predecir _mpg01_.
+
+```{r regLog}
+model.LogReg <- glm(mpg01 ~ ., data = Auto.train)
+prediction.LogReg <- predict(model.LogReg, newdata = Auto.test)
+prediction.LogReg
+error.test <- "¿Esto cómo va?"
+```
+
+El error de test de este modelo es ```r I(error.test)```.
+
+### Apartado d2)
+
+Ahora vamos a ajusart un modelo k-NN.
+
+```{r kNN}
+
+```
+
+### Apartado d3)
+
+Veamos las curvas ROC de ambos modelos.
+
+
+```{r ROC}
+roc.prediction.regLog <- prediction(prediction.LogReg, Auto.test$mpg01)
+roc.performance.regLog <- performance(roc.prediction.regLog, measure = "tpr", x.measure = "fpr")
+
+### Meter del knn
+
+####
+roc.performance.knn <- roc.performance.regLog
+
+roc.data <- data.frame(x  = roc.performance.regLog@x.values[[1]],
+                       y1 = roc.performance.regLog@y.values[[1]],
+                       y2 = roc.performance.knn@y.values[[1]])
+
+ggplot(roc.data, aes(x)) + 
+  geom_line(aes(y = y1, colour = "Logistic Regression")) +
+  geom_line(aes(y = y2, colour = "k-NN")) +
+  theme(legend.title = element_blank()) + 
+  labs(title= "ROC curves", x = "False positive rate", y = "True positive rate")
+
+auc.regLog  <- auc(roc.data$x,roc.data$y1, type = 'spline')
+auc.knn     <- auc(roc.data$x,roc.data$y2, type = 'spline')
+```
+
+El área bajo la curva de la ROC de regresión logística es ```r I(auc.regLog)``` y la del k-NN es ```r I(auc.knn)```. Luego ```r if(auc.regLog > auc.knn) "regresión logística" else "k-NN"``` es el modelo que mejor _performance_ tiene.
+
+### Apartado e) (BONUS)
+
+Para estudiar el error con validación cruzada hacemos uso de `cv.glm`
+
+```{r cv.glm}
+model.full.LogReg <- glm(mpg01 ~ ., data = Auto.selected)
+cv.LogReg <- cv.glm(data = Auto.selected, glmfit = model.full.LogReg, K = 5)
+cv.LogReg$delta
+```
+
+El error estimado es el primero de este vector. El segundo es un ajusto para compenar el sesgo introducido al no usar *Leave-One-Out*.
+
+Para el caso del k-NN
+
+```{r cv.knn}
+
+```
+
+Por tanto, vemos que es mejor _uno_.
+
+### Apartado f) (BONUS)
+
 
