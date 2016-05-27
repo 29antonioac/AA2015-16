@@ -199,35 +199,35 @@ Seguir con regularización.
 Al igual que en el anterior apartado, definimos una nueva variable usando la mediana como umbral.
 
 ```{r crim1}
-crim1 <- ifelse(Boston$crim > median(Boston$crim), 1, -1)
-Boston.full$crim1 <- crim1
+Boston.full$crim <- ifelse(Boston$crim > median(Boston$crim), 1, -1)
 Boston.train.crim1 <- Boston.full[index,]
 Boston.test.crim1 <- Boston.full[-index,]
+pairs(Boston.full)
 ```
 
 Ahora ajustamos varias _SVM_, probaremos la lineal y con los núcleos disponibles, y veremos cómo se comporta cada uno.
-'Ver cuál sería mejor a priori con pairs o similar'.
+Posiblemente el núcleo lineal no sea suficiente, ya que los datos no parecen lo suficientemente separados. A priori parece que uno polinomial hará un mejor trabajo.
 
 ```{r SVM}
-svm.linear <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "linear")
+svm.linear <- svm(crim ~ ., data = Boston.train.crim1, kernel = "linear")
 svm.linear.prediction <- predict(svm.linear, newdata = Boston.test.crim1[,-1])
-confusionMatrix(sign(svm.linear.prediction), Boston.test.crim1$crim1)
+confusionMatrix(sign(svm.linear.prediction), Boston.test.crim1$crim)
 
-svm.polynomial <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "polynomial")
+svm.polynomial <- svm(crim ~ ., data = Boston.train.crim1, kernel = "polynomial")
 svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test.crim1[,-1])
-confusionMatrix(sign(svm.polynomial.prediction), Boston.test.crim1$crim1)
+confusionMatrix(sign(svm.polynomial.prediction), Boston.test.crim1$crim)
 
-svm.radial <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "radial")
+svm.radial <- svm(crim ~ ., data = Boston.train.crim1, kernel = "radial")
 svm.radial.prediction <- predict(svm.radial, newdata = Boston.test.crim1[,-1])
-confusionMatrix(sign(svm.radial.prediction), Boston.test.crim1$crim1)
+confusionMatrix(sign(svm.radial.prediction), Boston.test.crim1$crim)
 
-svm.sigmoid <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "sigmoid")
+svm.sigmoid <- svm(crim ~ ., data = Boston.train.crim1, kernel = "sigmoid")
 svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test.crim1[,-1])
-confusionMatrix(sign(svm.sigmoid.prediction), Boston.test.crim1$crim1)
+confusionMatrix(sign(svm.sigmoid.prediction), Boston.test.crim1$crim)
 
 ```
 
-Analizar el error.
+Al final, el kernel polinomial ha sido el que mejor ha funcionado. El kernel lineal se comporta muy bien, pero el radial y el polinomial se comportan mejor.
 
 ## Apartado d) (Bonus-3)
 
