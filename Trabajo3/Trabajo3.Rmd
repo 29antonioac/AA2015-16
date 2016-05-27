@@ -14,6 +14,11 @@ require(GGally)
 require(ROCR)
 require(MESS)
 require(boot)
+require(MASS)
+require(glmnet)
+require(e1071)
+require(caret)
+require(knitr)
 
 set.seed(123456789)
 knitr::opts_chunk$set(echo = TRUE)
@@ -123,7 +128,7 @@ auc.knn     <- auc(roc.data$x,roc.data$y2, type = 'spline')
 
 El área bajo la curva de la ROC de regresión logística es ```r I(auc.regLog)``` y la del k-NN es ```r I(auc.knn)```. Luego ```r if(auc.regLog > auc.knn) "regresión logística" else "k-NN"``` es el modelo que mejor _performance_ tiene.
 
-### Apartado e) (BONUS)
+## Apartado e) (Bonus-1)
 
 Para estudiar el error con validación cruzada hacemos uso de `cv.glm`
 
@@ -143,6 +148,95 @@ Para el caso del k-NN
 
 Por tanto, vemos que es mejor _uno_.
 
-### Apartado f) (BONUS)
+## Apartado f) (Bonus-2)
+
+Por hacer
+
+# Ejercicio 2
+
+## Apartado a)
+
+Ajustamos con validación cruzada sobre la variable _crim_, que es la que está en la posición 1.
+
+```{r boston}
+attach(Boston)
+
+index <- sample(nrow(Boston), 0.8*nrow(Boston))
+Boston.full <- Boston
+Boston.train <- Boston[index,]
+Boston.test <- Boston[-index,]
+
+model.Boston <- glmnet(as.matrix(Boston.train[,-1]),Boston.train[,1], alpha = 1)
+
+```
 
 
+## Apartado b)
+
+Ahora utilizamos un método LASSO y seleccionamos las variables que están por encima de un umbral.
+
+```{r LASSO}
+cv.Boston <- cv.glmnet(as.matrix(Boston[,-1]), Boston[,1], nfolds = 5, alpha = 1)
+lasso.coeff <- predict(cv.Boston, type="coefficients", s = cv.Boston$lambda.min)
+threshold <- 0.1
+selected <- which(abs(lasso.coeff) > threshold)[-1]
+```
+
+Con esto afirmamos que las características que superan nuestro umbral ```r I(threshold)``` son ```r I(selected)```.
+
+Seguir con regularización.
+
+## Apartado c)
+
+Al igual que en el anterior apartado, definimos una nueva variable usando la mediana como umbral.
+
+```{r crim1}
+crim1 <- ifelse(Boston$crim > median(Boston$crim), 1, -1)
+Boston.full$crim1 <- crim1
+Boston.train <- Boston.full[index,]
+Boston.test <- Boston.full[-index,]
+```
+
+Ahora ajustamos varias _SVM_, probaremos la lineal y con los núcleos disponibles, y veremos cómo se comporta cada uno.
+'Ver cuál sería mejor a priori con pairs o similar'.
+
+```{r SVM}
+svm.linear <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "linear")
+svm.linear.prediction <- predict(svm.linear, newdata = Boston.test[,-1])
+# confusionMatrix(svm.linear.prediction, Boston.test$crim1)
+svm.linear.prediction
+
+svm.polynomial <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "polynomial")
+svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test[,-1])
+# confusionMatrix(svm.polynomial.prediction, Boston.test$crim1)
+svm.polynomial.prediction
+
+svm.radial <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "radial")
+svm.radial.prediction <- predict(svm.radial, newdata = Boston.test[,-1])
+# confusionMatrix(svm.radial.prediction, Boston.test$crim1)
+svm.radial.prediction
+
+svm.sigmoid <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "sigmoid")
+svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test[,-1])
+# confusionMatrix(svm.sigmoid.prediction, Boston.test$crim1)
+svm.sigmoid.prediction
+```
+
+Analizar el error.
+
+## Apartado d) (Bonus-3)
+
+Ajustamos con validación cruzada sobre la variable _crim_.
+
+```{r cvBoston, eval=F}
+
+cv.Boston <- cv.glmnet(as.matrix(Boston[,-1]), Boston[,1], nfolds = 5, alpha = 1)
+```
+
+El error de validación cruzada (respondiendo al Bonus-3) es 
+
+```{r}
+cv.Boston$cvm
+```
+
+Completar solución.
