@@ -18,6 +18,8 @@ require(MASS)
 require(glmnet)
 require(e1071)
 require(caret)
+require(randomForest)
+require(gbm)
 require(knitr)
 
 set.seed(123456789)
@@ -193,31 +195,31 @@ Al igual que en el anterior apartado, definimos una nueva variable usando la med
 ```{r crim1}
 crim1 <- ifelse(Boston$crim > median(Boston$crim), 1, -1)
 Boston.full$crim1 <- crim1
-Boston.train <- Boston.full[index,]
-Boston.test <- Boston.full[-index,]
+Boston.train.crim1 <- Boston.full[index,]
+Boston.test.crim1 <- Boston.full[-index,]
 ```
 
 Ahora ajustamos varias _SVM_, probaremos la lineal y con los núcleos disponibles, y veremos cómo se comporta cada uno.
 'Ver cuál sería mejor a priori con pairs o similar'.
 
 ```{r SVM}
-svm.linear <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "linear")
-svm.linear.prediction <- predict(svm.linear, newdata = Boston.test[,-1])
+svm.linear <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "linear")
+svm.linear.prediction <- predict(svm.linear, newdata = Boston.test.crim1[,-1])
 # confusionMatrix(svm.linear.prediction, Boston.test$crim1)
 svm.linear.prediction
 
-svm.polynomial <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "polynomial")
-svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test[,-1])
+svm.polynomial <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "polynomial")
+svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test.crim1[,-1])
 # confusionMatrix(svm.polynomial.prediction, Boston.test$crim1)
 svm.polynomial.prediction
 
-svm.radial <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "radial")
-svm.radial.prediction <- predict(svm.radial, newdata = Boston.test[,-1])
+svm.radial <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "radial")
+svm.radial.prediction <- predict(svm.radial, newdata = Boston.test.crim1[,-1])
 # confusionMatrix(svm.radial.prediction, Boston.test$crim1)
 svm.radial.prediction
 
-svm.sigmoid <- svm(crim1 ~ ., data = Boston.train[,-1], kernel = "sigmoid")
-svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test[,-1])
+svm.sigmoid <- svm(crim1 ~ ., data = Boston.train.crim1[,-1], kernel = "sigmoid")
+svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test.crim1[,-1])
 # confusionMatrix(svm.sigmoid.prediction, Boston.test$crim1)
 svm.sigmoid.prediction
 ```
@@ -240,3 +242,51 @@ cv.Boston$cvm
 ```
 
 Completar solución.
+
+# Ejercicio 3
+
+## Apartado a)
+
+Ya tenemos cargado y separado el conjunto de datos en 80% training y 20% test.
+
+## Apartado b)
+
+Vamos a ajusar un modelo de Bagging. Para ello usaremos el RandomForest y le diremos que use el total de características disponibles.
+
+```{r bagging}
+bagging <- randomForest(medv ~., data = Boston.full, subset = -index, mtray = ncol(Boston)-1, importance = TRUE)
+bagging.prediction <- predict(bagging, newdata = Boston.test)
+bagging.error <- "¿Esto cómo es?"
+```
+
+El error de test del modelo bagging es ```r I(bagging.error)```.
+
+## Apartado c)
+
+Ahora vamos a ajustar un RandomForest.
+
+```{r randomForest}
+randomFor <- randomForest(medv ~., data = Boston.full, subset = -index, importance = TRUE)
+
+randomFor.error <- "¿Esto cómo es?"
+```
+
+El número de árboles usado es ```r I(randomFor$ntree)```. El error de test es ```r I(randomFor.error)```.
+
+La diferencia con bagging es ...
+
+## Apartado d)
+
+Ajustamos un modelo de regresión con Boosting.
+
+```{r boosting}
+boosting <- gbm(medv~., data = Boston.train, distribution = "gaussian")
+pred <- predict(boosting, Boston.test, n.trees = 150)
+boosting.error <- "¿Esto cómo es?"
+```
+
+El error de test es ```r I(boosting.error)```.
+
+La diferencia con bagging y randomForest es...
+
+# Ejercicio 4
