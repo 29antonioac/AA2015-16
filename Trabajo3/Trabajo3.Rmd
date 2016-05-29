@@ -24,13 +24,17 @@ require(tree)
 require(knitr)
 
 set.seed(123456789)
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+
+mse <- function(sim, obs) mean( (sim - obs)^2, na.rm = TRUE)
 ```
 
 # Ejercicio 1
 
-```{r Auto, echo = FALSE}
+```{r Auto, echo = FALSE, cache = FALSE}
 attach(Auto)
+```
+```{r Auto2, echo = FALSE}
 pairs(Auto)
 ```
 
@@ -90,7 +94,6 @@ Vamos a ajustar un modelo de regresión logística para predecir _mpg01_.
 model.LogReg <- glm(mpg01 ~ ., data = Auto.train, family = binomial)
 prediction.LogReg <- predict(model.LogReg, newdata = Auto.test, type = "response")
 prediction.LogReg.labels <- ifelse(prediction.LogReg > 0.5, 1, 0)
-error.test <- "¿Esto cómo es?"
 error.test <- sum(sign(prediction.LogReg.labels) != sign(Auto.test$mpg01)) / 
                                                   length(prediction.LogReg.labels)
 ```
@@ -165,10 +168,14 @@ Por hacer
 
 Ajustamos con validación cruzada sobre la variable _crim_, que es la que está en la posición 1.
 
-```{r boston}
+```{r cache = FALSE}
 attach(Boston)
-set.seed(123456789)
 
+```
+
+
+```{r boston}
+set.seed(123456789)
 index <- sample(nrow(Boston), 0.8*nrow(Boston))
 Boston.full <- Boston
 Boston.train <- Boston[index,]
@@ -198,7 +205,7 @@ Seguir con regularización.
 
 Al igual que en el anterior apartado, definimos una nueva variable usando la mediana como umbral.
 
-```{r crim1}
+```{r crim1, cache = TRUE}
 Boston.full$crim <- ifelse(Boston$crim > median(Boston$crim), 1, -1)
 Boston.train.crim1 <- Boston.full[index,]
 Boston.test.crim1 <- Boston.full[-index,]
@@ -234,7 +241,6 @@ Al final, el kernel polinomial ha sido el que mejor ha funcionado. El kernel lin
 Ajustamos con validación cruzada sobre la variable _crim_.
 
 ```{r cvBoston, eval=F}
-
 cv.Boston <- cv.glmnet(as.matrix(Boston[,-1]), Boston[,1], nfolds = 5, alpha = 1)
 ```
 
@@ -242,6 +248,7 @@ El error de validación cruzada es
 
 ```{r}
 cv.Boston$cvm
+mean(cv.Boston$cvm)
 ```
 
 Completar solución.
@@ -254,12 +261,12 @@ Ya tenemos cargado y separado el conjunto de datos en 80% training y 20% test.
 
 ## Apartado b)
 
-Vamos a ajusar un modelo de Bagging. Para ello usaremos el RandomForest y le diremos que use el total de características disponibles.
+Vamos a ajusar un modelo de Bagging. Para ello usaremos el RandomForest y le diremos que use el total de características disponibles. El error de test lo mediremos siempre con el _MSE_.
 
 ```{r bagging}
-bagging <- randomForest(medv ~., data = Boston, subset = -index, mtray = ncol(Boston)-1, importance = TRUE)
+bagging <- randomForest(medv ~., data = Boston, subset = index, mtray = ncol(Boston)-1, importance = TRUE)
 bagging.prediction <- predict(bagging, newdata = Boston.test)
-bagging.error <- "¿Esto cómo es?"
+bagging.error <- mse(medv[-index], bagging.prediction)
 ```
 
 El error de test del modelo bagging es ```r I(bagging.error)```.
@@ -269,34 +276,33 @@ El error de test del modelo bagging es ```r I(bagging.error)```.
 Ahora vamos a ajustar un RandomForest.
 
 ```{r randomForest}
-randomFor <- randomForest(medv ~., data = Boston, subset = -index, importance = TRUE)
-
-randomFor.error <- "¿Esto cómo es?"
+randomFor <- randomForest(medv ~., data = Boston, subset = index, importance = TRUE)
+randomFor.prediction <- predict(randomFor, newdata = Boston.test)
+randomFor.error <- mse(medv[-index], randomFor.prediction)
 ```
 
 El número de árboles usado es ```r I(randomFor$ntree)```. El error de test es ```r I(randomFor.error)```.
 
-La diferencia con bagging es ...
 
 ## Apartado d)
 
-Ajustamos un modelo de regresión con Boosting.
+Ajustamos un modelo de regresión con Boosting. Como no tiene el mismo número de árboles por defecto que _randomForest_, lo ajustamos nosotros a 500, que es el parámetro por defecto del otro.
 
 ```{r boosting}
-boosting <- gbm(medv~., data = Boston.train, distribution = "gaussian")
-pred <- predict(boosting, Boston.test, n.trees = 100)
-boosting.error <- "¿Esto cómo es?"
+boosting <- gbm(medv ~ ., data = Boston.train, distribution = "gaussian", n.trees = 500)
+boosting.prediction <- predict(boosting, Boston.test, n.trees = 500)
+boosting.error <- mse(medv[-index], boosting.prediction)
 ```
 
 El error de test es ```r I(boosting.error)```.
 
-La diferencia con bagging y randomForest es...
+La diferencia con bagging y randomForest es notoria. Boosting se comporta mucho peor, dejando en el mejor lugar a RandomForest por muy poquito sobre Bagging. Esto es previsible, ya que _randomForest_ tiene una diversificación que no tiene _Bagging_, este tiende a sobreajustar más.
 
 # Ejercicio 4
 
-```{r OJ, include = FALSE}
+```{r OJ, echo = FALSE, cache = FALSE}
 attach(OJ)
-set.seed(123456789)
+
 ```
 
 ## Apartado a)
@@ -304,6 +310,7 @@ set.seed(123456789)
 Cogemos una muestra aleatoria de 800 elementos y lo usamos como training.
 
 ```{r OJsplit}
+set.seed(123456789)
 index <- sample(nrow(OJ), 800)
 OJ.train <- OJ[index,]
 OJ.test <- OJ[-index,]
@@ -321,10 +328,10 @@ model.tree <- tree(Purchase ~ ., data = OJ.train)
 Veamos un resumen del árbol.
 
 ```{r summaryTree}
-summary(model.tree)
+(model.tree.summary <- summary(model.tree))
 ```
 
-El número de nodos terminales es de 8, y tiene un error del 16.38%. Completar.
+El número de nodos terminales es de ```r I(model.tree.summary$size) ```, y tiene un error del ```r I(model.tree.summary$misclass[1] / model.tree.summary$misclass[2] * 100) ```%. Sin probar otros clasificadores, podemos afirmar que el árbol no es un buen clasificador para este problema, siguiendo la regla de que un clasificador se considera bueno a partir del 90% de acierto. Las variables usadas han sido ```r I(model.tree.summary$used)```.
 
 ## Apartado c)
 
@@ -332,21 +339,21 @@ Dibujamos el árbol obtenido.
 
 ```{r plotTree}
 plot(model.tree, main="Classification tree")
-text(model.tree, all=TRUE, cex=.8)
+text(model.tree, cex=.7)
 ```
 
-Interpretar.
+La variable que más ganancia de información tiene es _LoyalCH_, los dos primeros niveles del árbol usan solamente esta variable. Además, hay algunas ramificaciones sin utilidad: Si $LoyalCH < 0.27$, no hace falta volver a distinguir para deducir _MM_, por ejemplo. 
 
 ## Apartado d)
 
 Aplicamos el árbol a nuestros datos de test.
 
 ```{r testTree}
-prediction.tree <- predict(model.tree, OJ.test)
-prediction.tree
+prediction.tree <- predict(model.tree, OJ.test, type = "class")
+(error.test.tree <- confusionMatrix(prediction.tree, OJ.test$Purchase))
 ```
 
-Valorar resultados.
+La matrix de confusión muestra todos los datos necesarios. El error de test es 1 - _Acuraccy_, ```r I(1-error.test.tree$overall["Accuracy"])``` 
 
 ## Apartado e)
 
@@ -357,6 +364,7 @@ model.cv.tree <- cv.tree(model.tree, K = 5)
 model.cv.tree
 ```
 
+Para cada tamaño de árbol, calcula su error con validación cruzada. El mínimo error es el mínimo de _dev_. Lo  veremos con una gráfica en el siguiente apartado.
 
 ## Apartado f) (Bonus-4)
 
