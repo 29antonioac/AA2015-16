@@ -66,7 +66,7 @@ Auto.selected <- Auto[,c("displacement","horsepower","weight")]
 
 ## Apartado c)
 
-Como nuestro conjunto de datos es grande (```r I(nrow(Auto))``` instancias), podemos realizar un muestreo aleatorio. Así tampoco falseamos las muestras, cosa que podría pasarnos si realizamos un muestreo estratificado.
+Como nuestro conjunto de datos es grande (`r I(nrow(Auto))` instancias), podemos realizar un muestreo aleatorio. Así tampoco falseamos las muestras, cosa que podría pasarnos si realizamos un muestreo estratificado.
 
 ```{r split}
 index <- sample(nrow(Auto), size = 0.8*nrow(Auto) )
@@ -98,7 +98,7 @@ error.test <- sum(sign(prediction.LogReg.labels) != sign(Auto.test$mpg01)) /
                                                   length(prediction.LogReg.labels)
 ```
 
-El error de test de este modelo es ```r I(error.test*100)```.
+El error de test de este modelo es `r I(error.test*100)`.
 
 ### Apartado d2)
 
@@ -136,7 +136,7 @@ auc.regLog  <- auc(roc.data$x,roc.data$y1, type = 'spline')
 auc.knn     <- auc(roc.data$x,roc.data$y2, type = 'spline')
 ```
 
-El área bajo la curva de la ROC de regresión logística es ```r I(auc.regLog)``` y la del k-NN es ```r I(auc.knn)```. Luego ```r if(auc.regLog > auc.knn) "regresión logística" else "k-NN"``` es el modelo que mejor _performance_ tiene.
+El área bajo la curva de la ROC de regresión logística es `r I(auc.regLog)` y la del k-NN es `r I(auc.knn)`. Luego `r if(auc.regLog > auc.knn) "regresión logística" else "k-NN"` es el modelo que mejor _performance_ tiene.
 
 ## Apartado e) (Bonus-1)
 
@@ -197,7 +197,7 @@ threshold <- 0.1
 selected <- which(abs(lasso.coeff) > threshold)[-1]
 ```
 
-Con esto afirmamos que las características que superan nuestro umbral ```r I(threshold)``` son ```r I(selected)```.
+Con esto afirmamos que las características que superan nuestro umbral `r I(threshold)` son `r I(selected)`.
 
 Seguir con regularización.
 
@@ -269,7 +269,7 @@ bagging.prediction <- predict(bagging, newdata = Boston.test)
 bagging.error <- mse(medv[-index], bagging.prediction)
 ```
 
-El error de test del modelo bagging es ```r I(bagging.error)```.
+El error de test del modelo bagging es `r I(bagging.error)`.
 
 ## Apartado c)
 
@@ -277,11 +277,28 @@ Ahora vamos a ajustar un RandomForest.
 
 ```{r randomForest}
 randomFor <- randomForest(medv ~., data = Boston, subset = index, importance = TRUE)
+ggplot(data = data.frame(Trees = 1:randomFor$ntree, MSE = randomFor$mse), aes(x = Trees, y = MSE)) + 
+  geom_line()
+summary(randomFor)
 randomFor.prediction <- predict(randomFor, newdata = Boston.test)
 randomFor.error <- mse(medv[-index], randomFor.prediction)
+
+randomFor.optimalntree <- randomForest(medv ~., data = Boston, subset = index, importance = TRUE,
+                                       ntree = which(randomFor$mse == min(randomFor$mse)))
+randomFor.optimalntree.prediction <- predict(randomFor.optimalntree, newdata = Boston.test)
+randomFor.optimalntree.error <- mse(medv[-index], randomFor.optimalntree.prediction)
 ```
 
-El número de árboles usado es ```r I(randomFor$ntree)```. El error de test es ```r I(randomFor.error)```.
+El número de árboles óptimo es `r I(randomFor.optimalntree$ntree)`. El error de test usando 500 es `r I(randomFor.error)`, y el error de test usando el óptimo es `r I(randomFor.optimalntree.error)`.
+
+```{r echo = FALSE}
+msg <- "En este caso usar el óptimo no nos ha ofrecido mejora sobre el error de test."
+if (randomFor.optimalntree.error < randomFor.error)
+  msg <- "En este caso usar el óptimo nos ha ofrecido mejora sobre el error de test."
+```
+
+`r I(msg)`
+
 
 
 ## Apartado d)
@@ -294,7 +311,7 @@ boosting.prediction <- predict(boosting, Boston.test, n.trees = 500)
 boosting.error <- mse(medv[-index], boosting.prediction)
 ```
 
-El error de test es ```r I(boosting.error)```.
+El error de test es `r I(boosting.error)`.
 
 La diferencia con bagging y randomForest es notoria. Boosting se comporta mucho peor, dejando en el mejor lugar a RandomForest por muy poquito sobre Bagging. Esto es previsible, ya que _randomForest_ tiene una diversificación que no tiene _Bagging_, este tiende a sobreajustar más.
 
@@ -331,7 +348,7 @@ Veamos un resumen del árbol.
 (model.tree.summary <- summary(model.tree))
 ```
 
-El número de nodos terminales es de ```r I(model.tree.summary$size) ```, y tiene un error del ```r I(model.tree.summary$misclass[1] / model.tree.summary$misclass[2] * 100) ```%. Sin probar otros clasificadores, podemos afirmar que el árbol no es un buen clasificador para este problema, siguiendo la regla de que un clasificador se considera bueno a partir del 90% de acierto. Las variables usadas han sido ```r I(model.tree.summary$used)```.
+El número de nodos terminales es de `r I(model.tree.summary$size)`, y tiene un error del `r I(model.tree.summary$misclass[1] / model.tree.summary$misclass[2] * 100)`%. Sin probar otros clasificadores, podemos afirmar que el árbol no es un buen clasificador para este problema, siguiendo la regla de que un clasificador se considera bueno a partir del 90% de acierto. Las variables usadas han sido `r I(model.tree.summary$used)`.
 
 ## Apartado c)
 
@@ -353,7 +370,7 @@ prediction.tree <- predict(model.tree, OJ.test, type = "class")
 (error.test.tree <- confusionMatrix(prediction.tree, OJ.test$Purchase))
 ```
 
-La matrix de confusión muestra todos los datos necesarios. El error de test es 1 - _Acuraccy_, ```r I(1-error.test.tree$overall["Accuracy"])``` 
+La matrix de confusión muestra todos los datos necesarios. El error de test es 1 - _Acuraccy_, `r I(1-error.test.tree$overall["Accuracy"])` 
 
 ## Apartado e)
 
@@ -384,4 +401,4 @@ ggplot(error.tree, aes(x=size,y=error)) + geom_line() +
        y = "Error")
 ```
 
-Podemos ver que el mínimo de error se alcanza en ```r I(error.tree$size[which(error.tree$alpha == 1)])```.
+Podemos ver que el mínimo de error se alcanza en `r I(error.tree$size[which(error.tree$alpha == 1)])`.
