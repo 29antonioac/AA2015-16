@@ -8,6 +8,7 @@ output: pdf_document
 ```{r setup, include=FALSE}
 require(ISLR)
 require(ggplot2)
+require(plotROC)
 require(ggdendro)
 require(plotly)
 require(reshape)
@@ -144,18 +145,22 @@ roc.performance.knn <- performance(roc.prediction.knn, measure = "tpr", x.measur
 ####
 
 
-roc.data <- data.frame(x  = roc.performance.regLog@x.values[[1]],
-                       y1 = roc.performance.regLog@y.values[[1]],
-                       y2 = roc.performance.knn@y.values[[1]])
+roc.data <- data.frame(M = c(unlist(attr(roc.prediction.knn, "predictions")), 
+                              unlist(attr(roc.prediction.regLog, "predictions"))),
+                        D = c(unlist(attr(roc.prediction.knn, "labels")), 
+                            unlist(attr(roc.prediction.regLog, "labels"))),
+                      Model = c(rep("k-NN", nrow(Auto.test)), rep("RL", nrow(Auto.test))))
 
-ggplot(roc.data, aes(x)) + 
-  geom_line(aes(y = y1, colour = "Logistic Regression")) +
-  geom_line(aes(y = y2, colour = "k-NN")) +
-  theme(legend.title = element_blank()) + 
-  labs(title= "ROC curves", x = "False positive rate", y = "True positive rate")
 
-auc.regLog  <- auc(roc.data$x,roc.data$y1, type = 'spline')
-auc.knn     <- auc(roc.data$x,roc.data$y2, type = 'spline')
+g <- ggplot(roc.data, aes(d = D, m = M, color = Model)) + geom_roc(n.cuts = 0) + style_roc()
+auc <- round(calc_auc(g), 6)
+g <- g + annotate("text", x = .75, y = .25, 
+                  label = paste("AUC_knn = ", auc$AUC[2], "\nAUC_glm = ", auc$AUC[1]))
+g
+
+
+auc.regLog  <- auc$AUC[1]
+auc.knn     <- auc$AUC[2]
 ```
 
 El área bajo la curva de la ROC de regresión logística es `r I(auc.regLog)` y la del k-NN es `r I(auc.knn)`. Luego `r if(auc.regLog > auc.knn) "regresión logística" else "k-NN"` es el modelo que mejor _performance_ tiene.
