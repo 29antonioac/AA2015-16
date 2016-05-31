@@ -27,7 +27,7 @@ require(class)
 require(knitr)
 
 set.seed(100000004)
-knitr::opts_chunk$set(echo = TRUE, cache = F)
+knitr::opts_chunk$set(echo = TRUE, cache = T)
 
 mse <- function(sim, obs) mean( (sim - obs)^2, na.rm = TRUE)
 ```
@@ -180,10 +180,14 @@ El error estimado es el primero de este vector. El segundo es un ajuste para com
 Para el caso del k-NN
 
 ```{r cv.knn}
-
+set.seed(100000004)
+prediction.knn.cv <- knn.cv(scale.data, scale.labels, k = best.k, l = 0, prob = FALSE, use.all = TRUE)
+error.knn.cv <- sum(prediction.knn.cv != scale.labels) / length(prediction.knn.cv)
+error.knn.cv
 ```
 
-Por tanto, vemos que es mejor _uno_.
+
+Por tanto, vemos que es mejor `r if(error.knn.cv > cv.LogReg$delta[1]) "regresión logística" else "k-NN"`.
 
 ## Apartado f) (Bonus-2)
 
@@ -223,7 +227,7 @@ threshold <- 0.4
 selected <- which(abs(lasso.coeff) > threshold)[-1]
 ```
 
-Con esto afirmamos que las características que superan nuestro umbral `r I(threshold)` son `r I(selected)`.
+Con esto afirmamos que las características que superan nuestro umbral `r I(threshold)` son `r I(selected)`. Disminuir este umbral nos haría coger más características.
 
 ## Apartado b)
 
@@ -281,6 +285,8 @@ regularized.lambda3.residual <- sqrt(mse(Boston.test[,1],regularized.lambda3.pre
 
 El error residual es `r I(regularized.lambda3.residual)`.
 
+Hemos visto que al aumentar $\lambda$ el error residual ha bajado (aunque de $10\lambda$ a $100\lambda$ no se ha movido, por lo que parece haberse estabilizado), luego podemos afirmar que hay un poco de _underfitting_ con el mínimo $\lambda$ calculado.
+
 
 ## Apartado c)
 
@@ -298,19 +304,19 @@ Posiblemente el núcleo lineal no sea suficiente, ya que los datos no parecen lo
 
 ```{r SVM}
 svm.linear <- svm(crim ~ ., data = Boston.train.crim1, kernel = "linear")
-svm.linear.prediction <- predict(svm.linear, newdata = Boston.test.crim1[,-1])
+svm.linear.prediction <- predict(svm.linear, newdata = Boston.test.crim1)
 confusionMatrix(sign(svm.linear.prediction), Boston.test.crim1$crim)
 
 svm.polynomial <- svm(crim ~ ., data = Boston.train.crim1, kernel = "polynomial")
-svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test.crim1[,-1])
+svm.polynomial.prediction <- predict(svm.polynomial, newdata = Boston.test.crim1)
 confusionMatrix(sign(svm.polynomial.prediction), Boston.test.crim1$crim)
 
 svm.radial <- svm(crim ~ ., data = Boston.train.crim1, kernel = "radial")
-svm.radial.prediction <- predict(svm.radial, newdata = Boston.test.crim1[,-1])
+svm.radial.prediction <- predict(svm.radial, newdata = Boston.test.crim1)
 confusionMatrix(sign(svm.radial.prediction), Boston.test.crim1$crim)
 
 svm.sigmoid <- svm(crim ~ ., data = Boston.train.crim1, kernel = "sigmoid")
-svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test.crim1[,-1])
+svm.sigmoid.prediction <- predict(svm.sigmoid, newdata = Boston.test.crim1)
 confusionMatrix(sign(svm.sigmoid.prediction), Boston.test.crim1$crim)
 
 ```
@@ -321,18 +327,22 @@ Al final, el kernel polinomial ha sido el que mejor ha funcionado. El kernel lin
 
 Ajustamos con validación cruzada sobre la variable _crim_.
 
-```{r cvBoston, eval=F}
-cv.Boston <- cv.glmnet(as.matrix(Boston[,-1]), Boston[,1], nfolds = 5, alpha = 1)
+```{r cvBoston}
+cv.Boston <- cv.glmnet(as.matrix(Boston.full[,-1]), Boston.full[,1], nfolds = 5, alpha = 1, 
+                       type.measure="mse")
 ```
 
 El error de validación cruzada es 
 
-```{r}
+```{r, eval = F}
+summary(cv.Boston)
 cv.Boston$cvm
 mean(cv.Boston$cvm)
+prediction.Boston <- predict(cv.Boston, type="class", s = lambda.min)
+prediction.Boston
 ```
 
-Completar solución.
+Este es el error cuadrático medio por validación cruzada del modelo.
 
 # Ejercicio 3
 
@@ -354,7 +364,7 @@ El error de test del modelo bagging es `r I(bagging.error)`.
 
 ## Apartado c)
 
-Ahora vamos a ajustar un RandomForest.
+Ahora vamos a ajustar un RandomForest. Ajustaremos 2 y miraremos cuándo se empieza a estabilizar el error. A partir de ahí veremos dónde se alcanza el mínimo del error.
 
 ```{r randomForest}
 randomFor <- randomForest(medv ~., data = Boston, subset = index, importance = TRUE)
@@ -370,7 +380,7 @@ randomFor.optimalntree.prediction <- predict(randomFor.optimalntree, newdata = B
 randomFor.optimalntree.error <- mse(medv[-index], randomFor.optimalntree.prediction)
 ```
 
-El número de árboles óptimo es `r I(randomFor.optimalntree$ntree)`. El error de test usando 500 es `r I(randomFor.error)`, y el error de test usando el óptimo es `r I(randomFor.optimalntree.error)`.
+En este caso el error se estabiliza a partir de 100, más o menos. El número de árboles óptimo es `r I(randomFor.optimalntree$ntree)`. El error de test usando 500 es `r I(randomFor.error)`, y el error de test usando el óptimo es `r I(randomFor.optimalntree.error)`.
 
 ```{r echo = FALSE}
 msg <- "En este caso usar el óptimo no nos ha ofrecido mejora sobre el error de test. Parece que está sobreajustando."
