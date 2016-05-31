@@ -8,6 +8,7 @@ output: pdf_document
 ```{r setup, include=FALSE}
 require(ISLR)
 require(ggplot2)
+require(ggdendro)
 require(plotly)
 require(reshape)
 require(GGally)
@@ -21,10 +22,11 @@ require(caret)
 require(randomForest)
 require(gbm)
 require(tree)
+require(class)
 require(knitr)
 
-set.seed(123456789)
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+set.seed(100000004)
+knitr::opts_chunk$set(echo = TRUE, cache = F)
 
 mse <- function(sim, obs) mean( (sim - obs)^2, na.rm = TRUE)
 ```
@@ -105,8 +107,25 @@ El error de test de este modelo es `r I(error.test*100)`.
 Ahora vamos a ajusart un modelo k-NN.
 
 ```{r kNN}
+scale.train <- scale(Auto.train[, colnames(Auto.train) != "mpg01"])
+means <- attr(scale.train, "scaled:center")
+scales <- attr(scale.train, "scaled:scale")
+
+scale.test <- scale(Auto.test[, colnames(Auto.train) != "mpg01"], means, scales)
+scale.data <- rbind(scale.train, scale.test)
+scale.labels <- as.factor(c(Auto.train$mpg01, Auto.test$mpg01))
+
+set.seed(100000004)
+tune.result <- tune.knn(scale.data, scale.labels, k = 1:30, tunecontrol = tune.control(sampling = "cross"))
+
+best.k <- tune.result$best.model$k
+
+prediction.knn <- knn(scale.train, scale.test, Auto.train$mpg01, k = best.k, prob = TRUE)
+error.test.knn <- sum(prediction.knn != Auto.test$mpg01) / length(prediction.knn)
 
 ```
+
+El error del k-NN con $k = `r I(best.k)`$ es `r I(error.test.knn*100)`.
 
 ### Apartado d3)
 
@@ -117,10 +136,13 @@ Veamos las curvas ROC de ambos modelos.
 roc.prediction.regLog <- prediction(prediction.LogReg, Auto.test$mpg01)
 roc.performance.regLog <- performance(roc.prediction.regLog, measure = "tpr", x.measure = "fpr")
 
-### Meter del knn
-
+## kNN
+prob <- attr(prediction.knn, "prob")
+prob <- ifelse(prediction.knn == "0", 1-prob, prob)
+roc.prediction.knn <- prediction(prob, Auto.test$mpg01)
+roc.performance.knn <- performance(roc.prediction.knn, measure = "tpr", x.measure = "fpr")
 ####
-roc.performance.knn <- roc.performance.regLog
+
 
 roc.data <- data.frame(x  = roc.performance.regLog@x.values[[1]],
                        y1 = roc.performance.regLog@y.values[[1]],
@@ -166,7 +188,7 @@ Por hacer
 
 ## Apartado a)
 
-Ajustamos con validación cruzada sobre la variable _crim_, que es la que está en la posición 1.
+Ajustamos sobre la variable _crim_, que es la que está en la posición 1, con partición de datos de 80% y test de 20% con muestreo aleatorio.
 
 ```{r cache = FALSE}
 attach(Boston)
@@ -175,7 +197,7 @@ attach(Boston)
 
 
 ```{r boston}
-set.seed(123456789)
+set.seed(100000004)
 index <- sample(nrow(Boston), 0.8*nrow(Boston))
 Boston.full <- Boston
 Boston.train <- Boston[index,]
@@ -186,20 +208,74 @@ model.Boston <- glmnet(as.matrix(Boston.train[,-1]),Boston.train[,1], alpha = 1)
 ```
 
 
-## Apartado b)
-
 Ahora utilizamos un método LASSO y seleccionamos las variables que están por encima de un umbral.
 
 ```{r LASSO}
 cv.Boston <- cv.glmnet(as.matrix(Boston[,-1]), Boston[,1], nfolds = 5, alpha = 1)
-lasso.coeff <- predict(cv.Boston, type="coefficients", s = cv.Boston$lambda.min)
-threshold <- 0.1
+lambda.min <- cv.Boston$lambda.min
+lasso.coeff <- predict(cv.Boston, type="coefficients", s = lambda.min)
+threshold <- 0.4
 selected <- which(abs(lasso.coeff) > threshold)[-1]
 ```
 
 Con esto afirmamos que las características que superan nuestro umbral `r I(threshold)` son `r I(selected)`.
 
-Seguir con regularización.
+## Apartado b)
+
+Para realizar regularización _weight-decay_ debemos usar de nuevo _glmnet_ pero con el parámetro $\alpha=0$. 
+
+```{r weight-decay}
+Boston.selected.train <- Boston.train[,selected]
+Boston.selected.test <- Boston.test[,selected]
+
+regularized.model <- glmnet(as.matrix(Boston.selected.train),
+                            as.matrix(Boston.train[,1]),
+                            alpha = 0, lambda = lambda.min)
+
+regularized.prediction <- predict(regularized.model, s = lambda.min,
+                                  newx = as.matrix(Boston.selected.test))
+```
+
+El error residual es la raíz cuadrada positiva del error cuadrático medio.
+
+```{r residuals}
+regularized.residual <- sqrt(mse(Boston.test[,1],regularized.prediction))
+```
+
+El error residual es `r I(regularized.residual)`.
+
+Para ver si hay underfitting, probemos con distintos valores de lambda. 
+
+```{r lambda2}
+lambda2 <- 10*lambda.min
+regularized.lambda2.model <- glmnet(as.matrix(Boston.selected.train),
+                            as.matrix(Boston.train[,1]),
+                            alpha = 0, lambda = lambda2)
+
+regularized.lambda2.prediction <- predict(regularized.lambda2.model, s = lambda2,
+                                  newx = as.matrix(Boston.selected.test))
+
+regularized.lambda2.residual <- sqrt(mse(Boston.test[,1],regularized.lambda2.prediction))
+
+```
+
+El error residual es `r I(regularized.lambda2.residual)`.
+
+```{r lambda3}
+lambda3 <- 100*lambda.min
+regularized.lambda3.model <- glmnet(as.matrix(Boston.selected.train),
+                            as.matrix(Boston.train[,1]),
+                            alpha = 0, lambda = lambda3)
+
+regularized.lambda3.prediction <- predict(regularized.lambda2.model, s = lambda3,
+                                  newx = as.matrix(Boston.selected.test))
+
+regularized.lambda3.residual <- sqrt(mse(Boston.test[,1],regularized.lambda3.prediction))
+
+```
+
+El error residual es `r I(regularized.lambda3.residual)`.
+
 
 ## Apartado c)
 
@@ -284,7 +360,7 @@ randomFor.prediction <- predict(randomFor, newdata = Boston.test)
 randomFor.error <- mse(medv[-index], randomFor.prediction)
 
 randomFor.optimalntree <- randomForest(medv ~., data = Boston, subset = index, importance = TRUE,
-                                       ntree = which(randomFor$mse == min(randomFor$mse)))
+                                       ntree = which(randomFor$mse == min(randomFor$mse[100:length(randomFor$mse)])))
 randomFor.optimalntree.prediction <- predict(randomFor.optimalntree, newdata = Boston.test)
 randomFor.optimalntree.error <- mse(medv[-index], randomFor.optimalntree.prediction)
 ```
@@ -292,7 +368,7 @@ randomFor.optimalntree.error <- mse(medv[-index], randomFor.optimalntree.predict
 El número de árboles óptimo es `r I(randomFor.optimalntree$ntree)`. El error de test usando 500 es `r I(randomFor.error)`, y el error de test usando el óptimo es `r I(randomFor.optimalntree.error)`.
 
 ```{r echo = FALSE}
-msg <- "En este caso usar el óptimo no nos ha ofrecido mejora sobre el error de test."
+msg <- "En este caso usar el óptimo no nos ha ofrecido mejora sobre el error de test. Parece que está sobreajustando."
 if (randomFor.optimalntree.error < randomFor.error)
   msg <- "En este caso usar el óptimo nos ha ofrecido mejora sobre el error de test."
 ```
@@ -327,7 +403,7 @@ attach(OJ)
 Cogemos una muestra aleatoria de 800 elementos y lo usamos como training.
 
 ```{r OJsplit}
-set.seed(123456789)
+set.seed(100000004)
 index <- sample(nrow(OJ), 800)
 OJ.train <- OJ[index,]
 OJ.test <- OJ[-index,]
@@ -357,6 +433,7 @@ Dibujamos el árbol obtenido.
 ```{r plotTree}
 plot(model.tree, main="Classification tree")
 text(model.tree, cex=.7)
+ggdendrogram(model.tree, rotate = FALSE, size = 2)
 ```
 
 La variable que más ganancia de información tiene es _LoyalCH_, los dos primeros niveles del árbol usan solamente esta variable. Además, hay algunas ramificaciones sin utilidad: Si $LoyalCH < 0.27$, no hace falta volver a distinguir para deducir _MM_, por ejemplo. 
