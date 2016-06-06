@@ -140,7 +140,12 @@
   \end{solucion}
 
   \begin{cuestion}
-    cuestion
+    Suponga que separamos 100 ejemplos de un conjunto $\mathcal{D}$ que no serán usados para entrenamiento, sino que serán usados para seleccionar una de las tres hipótesis finales $g_1,g_2,g_3$ producidas por tres algoritmos de aprendizaje distintos entrenados sobre el resto de datos. Cada algoritmo trabaja con un conjunto $\mathcal{H}$ de tamaño $500$. Nuestro deseo es caracterizar la precisión de la estimación $E_{out}(g)$ sobre la hipótesis final seleccionada cuando usamos los mismos 100 ejemplos para hacer la estimación.
+
+    \begin{enumerate}
+      \item[a)] ¿Qué expresión usaría para calcular la preción? Justifique la decisión.
+      \item[b)] ¿Cuál es el nivel de contaminación de estos 100 ejemplos comparándolo con el caso donde estas muestras fueran usadas en el entrenamiento en lugar de en la selección final?
+    \end{enumerate}
   \end{cuestion}
 
   \begin{solucion}
@@ -148,7 +153,7 @@
   \end{solucion}
 
   \begin{cuestion}
-    cuestion
+    Considere la tarea de seleccionar una regla del vecino más cercano. ¿Qué hay de erróneo en la siguiente lógica que se aplica a la selección de $k$? (Los límites son cuando $N \rightarrow \infty$). ``Considere la posibilidad de establecer la clase de hipótesis $\mathcal{H}_{NN}$ con N reglas, las k-NN hipótesis, usando $k=1,\ldots,N$. Use el error dentro de la muestra para elegir un valor de $k$ que minimiza $E_{in}$. Utilizando el error de generalización para N hipótesis, obtenemos la conclusión de que $E_{in} \rightarrow E_{out}$ porque $\frac{\log(N)}{N} \rightarrow 0$. Por lo tanto concluimos que asintóticamente, estaremos eligiendo el mejor valor de $k$, basándonos sólo en $E_{in}$''.
   \end{cuestion}
 
   \begin{solucion}
