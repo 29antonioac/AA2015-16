@@ -178,7 +178,7 @@
 
     $$ d(x,y) = \sqrt{(x_1 - x_2)^2 + (y_1-y_2)^2} $$
 
-    Como la raíz cuadrada es una función creciente, podemos minimizar lo que queda dentro de la raíz, ya que alcanzan el mínimo en el mismo punto. Por tanto, nuestra función $f$ a minimizar es:
+    Como la raíz cuadrada es una función creciente y positiva, podemos minimizar lo que queda dentro de la raíz. Por tanto, nuestra función $f$ a minimizar es:
 
     $$ f(x,y) = (x_1 - x_2)^2 + (y_1-y_2)^2 $$
 
@@ -207,6 +207,8 @@
     Por tanto, el punto $(x_0,y_0)$ de la recta $ax+by+d=0$ más cercano a un punto del plano $(x_1, y_1)$ es
 
     $$ (x_0, y_0) = (x_1 - a \; \frac{ax_1 + by_1 + d}{a^2+b^2}, y_1 - b \; \frac{ax_1 + by_1 + d}{a^2+b^2}) $$
+
+    Que coincide con la proyección ortogonal de $(x_1,y_1)$ a la recta dada. Geométricamente sabemos que la distancia entre ellos es mínima.
 
 
   \end{solucion}
@@ -354,7 +356,7 @@
     \begin{enumerate}
       \item El ruido determinista está directamente determinado por $\mathcal{H}$, ya que es la parte que no ajustamos bien de $f$. Si incrementamos la complejidad de $f$, el ruido determinista aumentará, ya que al aumentar la complejidad de la función objetivo manteniendo nuestro espacio de hipótesis, cada vez ajustaremos peor. Luego la diferencia entre la función objetivo (cuya complejidad va aumentando) y nuestra función estimada, que pertenece a $\mathcal{H}$ (que dejamos fijo) será cada vez mayor.
 
-      Acerca del sobreajuste, la tendencia será a sobreajustar más. Esto se debe a que se intentará aprender todo lo posible de $f$, sin poder determinar si algunos datos son ruido o no. 
+      Acerca del sobreajuste, la tendencia será a sobreajustar más. Esto se debe a que se intentará aprender todo lo posible de $f$, sin poder determinar si algunos datos son ruido o no.
       \item En este caso también va a subir el ruido determinista. Porque la $f$ es fija, pero al quitar complejidad a $\mathcal{H}$ cada vez podremos ajustar peor cada uno de los datos de la muestra, teniendo un ajuste peor de $f$ y por tanto más ruido determinista.
 
       Acerca del sobreajuste, la tendencia será a sobreajustar menos. Al decrementar la complejidad de $\mathcal{H}$ estamos ajustando peor cada uno de los puntos de la muestra, como ya hemos comentado. Al no poder focalizar sobre cada uno de los puntos individualmente, el sobreajuste baja, aunque cada vez ajustará peor la función objetivo.
