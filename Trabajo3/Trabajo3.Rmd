@@ -9,7 +9,6 @@ output: pdf_document
 require(ISLR)
 require(ggplot2)
 require(plotROC)
-require(ggdendro)
 require(plotly)
 require(reshape)
 require(GGally)
@@ -334,12 +333,9 @@ cv.Boston <- cv.glmnet(as.matrix(Boston.full[,-1]), Boston.full[,1], nfolds = 5,
 
 El error de validación cruzada es 
 
-```{r, eval = F}
-summary(cv.Boston)
+```{r}
 cv.Boston$cvm
 mean(cv.Boston$cvm)
-prediction.Boston <- predict(cv.Boston, type="class", s = lambda.min)
-prediction.Boston
 ```
 
 Este es el error cuadrático medio por validación cruzada del modelo.
@@ -448,10 +444,9 @@ Dibujamos el árbol obtenido.
 ```{r plotTree}
 plot(model.tree, main="Classification tree")
 text(model.tree, cex=.7)
-ggdendrogram(model.tree, rotate = FALSE, size = 2)
 ```
 
-La variable que más ganancia de información tiene es _LoyalCH_, los dos primeros niveles del árbol usan solamente esta variable. Además, hay algunas ramificaciones sin utilidad: Si $LoyalCH < 0.27$, no hace falta volver a distinguir para deducir _MM_, por ejemplo. 
+La variable que más ganancia de información tiene es _LoyalCH_, los dos primeros niveles del árbol usan solamente esta variable. Además, hay algunas ramificaciones sin utilidad: Si $LoyalCH < 0.05$, no hace falta volver a distinguir para deducir _MM_, por ejemplo. 
 
 ## Apartado d)
 
