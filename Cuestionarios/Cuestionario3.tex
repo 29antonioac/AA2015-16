@@ -113,15 +113,23 @@
 
     \begin{enumerate}
       \item[a)] ¿Cuántas hipótesis contienen $\mathcal{H}_1$ y $\mathcal{H}_{100}$ ?
-      \item[b)] ¿Cuántos bits son necesarios para especificar uan de las hipótesis en $\mathcal{H}_1$?
-      \item[c)] ¿Cuántos bits son necesarios para especificar uan de las hipótesis en $\mathcal{H}_{100}$?
+      \item[b)] ¿Cuántos bits son necesarios para especificar una de las hipótesis en $\mathcal{H}_1$?
+      \item[c)] ¿Cuántos bits son necesarios para especificar una de las hipótesis en $\mathcal{H}_{100}$?
     \end{enumerate}
 
     Argumente sobre la relación entre la complejidad de una clase de funciones y la complejidad de sus componentes.
   \end{cuestion}
 
   \begin{solucion}
-    solucion
+    Respondamos a cada cuestión:
+
+    \begin{enumerate}
+      \item[a)] $\mathcal{H}_1$ contiene $2^{10}$ hipótesis. Esto es porque para una función booleana con $10$ entradas, obtenemos $2^{10}=1024$ salidas. Como queremos $1$ en una entrada y $-1$ en lo demás, este número coincide con el número de posibles entradas. Para el caso $\mathcal{H}_{100}$ razonamos igual, aunque esta vez debemos coger de las $1024$ posibilidades, subconjuntos de $100$ $1$. Por tanto, este es el número combinatorio ${\binom{1024}{100}} = 7.7466\ldots \times 10^{140}$.
+      \item[b)] Para especificar una de las hipótesis de $\mathcal{H}_1$ sólo nos hace falta especificar el punto donde vale $+1$, luego con $10$ bits es suficiente.
+      \item[c)] Al igual que antes, necesitamos especificar dónde vale $+1$ la hipótesis. Como tenemos $100$ $+1$, necesitamos $100 \cdot 10 = 1000$ bits.
+    \end{enumerate}
+
+    La complejidad de una clase de funciones está directamente relacionada con la de sus componentes. A más complejidad en las componentes, más compleja será la clase de funciones. Le estamos dando más grados de libertad a las funciones del conjunto de hipótesis cuanto más aumentamos la complejidad de las componentes. 
   \end{solucion}
 
   \begin{cuestion}
