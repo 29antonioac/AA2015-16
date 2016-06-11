@@ -262,7 +262,17 @@
   \end{cuestion}
 
   \begin{solucion}
-    solucion
+    Derivamos con respecto a w, que simplemente es aplicar la regla de la cadena varias veces:
+
+    \[
+    \nabla E_{in}(w) = \frac{1}{N} \sum_{n=1}^N 2 \left( tanh(x_n^Tw) - y_n \right) \left( 1 - tanh(x_n^Tw)^2 \right) x_n
+    \]
+
+    Si $w \rightarrow \infty$, queda, utilizando los límites del ejercicio 8:
+
+    \[
+    \lim_{w \rightarrow \infty}\nabla E_{in}(w) =  \lim_{w \rightarrow \infty}\frac{1}{N} \sum_{n=1}^N 2 \underbrace{\left( tanh(x_n^Tw) - y_n \right)}_{\in \{-2,-1,0,+1,+2\}} \underbrace{\left( 1 - tanh(x_n^Tw)^2 \right)}_{0} x_n = 0.
+    \]
   \end{solucion}
 
 \end{document}
