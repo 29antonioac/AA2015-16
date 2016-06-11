@@ -181,13 +181,19 @@
     Suponga que separamos 100 ejemplos de un conjunto $\mathcal{D}$ que no serán usados para entrenamiento, sino que serán usados para seleccionar una de las tres hipótesis finales $g_1,g_2,g_3$ producidas por tres algoritmos de aprendizaje distintos entrenados sobre el resto de datos. Cada algoritmo trabaja con un conjunto $\mathcal{H}$ de tamaño $500$. Nuestro deseo es caracterizar la precisión de la estimación $E_{out}(g)$ sobre la hipótesis final seleccionada cuando usamos los mismos 100 ejemplos para hacer la estimación.
 
     \begin{enumerate}
-      \item[a)] ¿Qué expresión usaría para calcular la preción? Justifique la decisión.
+      \item[a)] ¿Qué expresión usaría para calcular la precisión? Justifique la decisión.
       \item[b)] ¿Cuál es el nivel de contaminación de estos 100 ejemplos comparándolo con el caso donde estas muestras fueran usadas en el entrenamiento en lugar de en la selección final?
     \end{enumerate}
   \end{cuestion}
 
   \begin{solucion}
-    solucion
+    Resolvemos por partes.
+    \begin{enumerate}
+      \item[a)] Como el conjunto $\mathcal{H}$ es finito, la expresión que debemos utilizar para estimar $E_{out}$ es la desigualdad de Hoeffding. Lo único que tenemos que ajustar es $|\mathcal{H}|$. Es claro que $|\mathcal{H}| = \sum_{i=1}^3 |\mathcal{H}_i| = 1500$, ya que las tres funciones han sido propuestas por los propios algoritmos de aprendizaje.
+      \item[b)] La contaminación es mayor si elegimos la función hipótesis en base a estos 100 ejemplos, ya que dependerá en mayor medida de estos 100 ejemplos. Si hubiéramos dejado dentro estos 100 elementos, habrán tenido peso en la elección de una hipótesis, o incluso contaminaríamos el aprendizaje como en el ejercicio anterior (el modelo conoce los datos), pero posiblemente esta contaminación sea más indirecta.
+    \end{enumerate}
+
+
   \end{solucion}
 
   \begin{cuestion}
