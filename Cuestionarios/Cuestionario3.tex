@@ -154,6 +154,7 @@
       \item[c)] Como se ha explicado antes, hay que enviarle cartas a las personas que hayan recibido la predicción correcta. En el caso anterior, para asegurarnos que una persona reciba después de 5 semanas las predicciones correctas, hay que enviar cartas a la mitad de personas, $2^4=16$.
       \item[d)] En total se mandan $\sum_{i=1}^5 2^i = 62$
       \item[e)] Se habría gastado 31\euro{} y habría ganado 50.000\euro{}, luego el beneficio sería de 49.969\euro{}.
+      \item[f)] El espacio de hipótesis es desconocido para todos los receptores de cartas. Para estas personas, mientras vaya acertando el predictor, la función de crecimiento es $1$, por lo la credibilidad en el ajuste es total. Pero en realidad, la función de crecimiento de este modelo es $2^N$, siendo $N$ el número de partidos a predecir, por lo que la credibilidad del ajuste es muy baja al ser baja la probabilidad de que se dé el resultado esperado.
     \end{enumerate}
   \end{solucion}
 
@@ -223,7 +224,17 @@
   \end{cuestion}
 
   \begin{solucion}
-    solucion
+    Hagamos en primer lugar un pequeño análisis de la función $tanh(\alpha x), \alpha \in \mathbb{R}$. Veamos qué pasa cuando $\alpha \rightarrow \infty$. Por la forma de la tangente hiperbólica, podemos esperar qué va a pasar.
+
+    \[
+      \lim_{\alpha \rightarrow + \infty} tanh(\alpha x) = \lim_{\alpha \rightarrow + \infty} \frac{e^{\alpha x} - e^{-\alpha x}}{e^{\alpha x} + e^{-\alpha x}} = 1
+    \]
+
+    \[
+      \lim_{\alpha \rightarrow - \infty} tanh(\alpha x) = \lim_{\alpha \rightarrow - \infty} \frac{e^{\alpha x} - e^{-\alpha x}}{e^{\alpha x} + e^{-\alpha x}} = -1
+    \]
+
+    Deducimos entonces que $sign(x) \approx tanh(\alpha x), \; \alpha \rightarrow \infty$. Vamos a tomar $w_2 = \alpha \cdot w_1$. Podemos hacer dicha diferencia tan pequeña como queramos ($\epsilon$) aumentando $\alpha$ todo lo que queramos hasta alcanzar dicho $\epsilon$.
   \end{solucion}
 
   \begin{cuestion}
