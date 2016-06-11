@@ -162,7 +162,7 @@
   \end{cuestion}
 
   \begin{solucion}
-    El objetivo no tiene por qué conseguirse, porque a priori no sabemos si la muestra es realmente representativa. Si la distribución de tamaño de los peces del lago no coincide con la distribución que sigue la muestra, el objetivo no se cumplirá, porque hemos estado tomando una muestra sesgada de la población de peces.
+    El objetivo no tiene por qué conseguirse, porque a priori no sabemos si la muestra es realmente representativa. Si la distribución de tamaño de los peces del lago no coincide con la distribución que sigue la muestra, el objetivo no se cumplirá, porque hemos estado tomando una muestra sesgada de la población de peces. Factores como la época del año, el tamaño y forma de la red o el lugar donde se realiza la prueba son idóneos para sesgar la muestra.
   \end{solucion}
 
   \begin{cuestion}
@@ -170,7 +170,11 @@
   \end{cuestion}
 
   \begin{solucion}
-    solucion
+    El principal problema es que hemos visto los datos. Al haber visto los datos ya tenemos información del problema, lo cual sesga el conocimiento que podemos aprender de ellos. Así se pierde la capacidad de generalización del modelo.
+
+    El tema de la cota pierde totalmente su validez al haber contaminado el aprendizaje, luego esa cota tampoco será real.
+
+    Una forma correcta de actuar sería tomar un modelo, analizar sus errores dentro de la muestra y de test y ya con la $d_{VC}$ calcularíamos una cota del error de generalización. Esto aplicado a varios modelos podrá darnos una estimación más fiable del modelo más apropiado para este problema.
   \end{solucion}
 
   \begin{cuestion}
