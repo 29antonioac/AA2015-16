@@ -244,12 +244,17 @@
 
     En términos de V y Q, ¿Cuántas operaciones se realizan en un pase hacia adelante (sumas, multiplicaciones, y evaluaciones de $\theta$)? Ayuda: Analizar la complejidad en términos de V y de Q.
 
-
-
   \end{cuestion}
 
   \begin{solucion}
-    solucion
+    Como para una multiplicación matriz-vector hay que realizar una multiplicación por cada elemento de la matriz, entonces hay una multiplicación por cada uno de los pesos de la red. Luego hay $Q$ multiplicaciones. En términos de complejidad es $O(Q)$.
+
+    Para las sumas en una multiplicación matriz-vector de tamaño $n \times m$ hay que realizar $n \cdot (m-1)$ sumas. Por lo que, si para cada capa hay que realizar $\left(d^{(\ell)} \right) \cdot \left(d^{(\ell - 1)} \right)$ sumas, en total son
+    $\sum_{\ell=1}^L d^{(\ell)}  d^{(\ell+1)} $. En términos de $Q$, separando la sumatoria de $Q$, nos salen $Q-V+d^{(0)}$. En términos de complejidad es $O(Q)$, ya que $Q$ tiene un orden de magnitud (según $d$) mayor que $V$.
+
+    Por último, las $\theta-\text{evaluaciones}$. La función se evalúa en $\sum_{\ell=1}^L d^{(\ell)} = V - d^{(0)}$ ocasiones, luego en términos de complejidad es $O(V)$.
+
+    En total, el número de operaciones totales es $Q$.
   \end{solucion}
 
   \begin{cuestion}
