@@ -152,8 +152,8 @@
       \item[a)] Suponiendo que los partidos no pueden empatar, las posibles predicciones gana-pierde son claramente $2^5=32$ posibilidades.
       \item[b)] Al ser un problema binario, el número mínimo de cartas a enviar es $\sum_{i=1}^5 2^i$. Esto es porque la primera semana se deben enviar $2^5=32$ cartas, la mitad de ellas con una posibilidad (gana A) y la otra mitad con la otra (gana B). La siguiente semana sólo la mitad de ellos tendrán la predicción correcta, luego hay que enviar $2^4=16$ cartas a los que obtuvieron la predicción correcta, igualmente con mitad y mitad. Así hasta la 5º semana, que sólo habrá que enviar $2^1=2$ cartas, asegurando a una persona haber recibido 5 predicciones correctas.
       \item[c)] Como se ha explicado antes, hay que enviarle cartas a las personas que hayan recibido la predicción correcta. En el caso anterior, para asegurarnos que una persona reciba después de 5 semanas las predicciones correctas, hay que enviar cartas a la mitad de personas, $2^4=16$.
-      \item[d)] En total se mandan $\sum_{i=1}^5 2^i = 62$
-      \item[e)] Se habría gastado 31\euro{} y habría ganado 50.000\euro{}, luego el beneficio sería de 49.969\euro{}.
+      \item[d)] En total se mandan $\sum_{i=1}^5 2^i = 62$. Si contamos la última carta, la que le manda al receptor de las 5 predicciones correctas, pidiendo los 50.000\euro{}, en total se mandan $63$ cartas.
+      \item[e)] Se habría gastado 31\euro{} y habría ganado 50.000\euro{}, luego el beneficio sería de 49.969\euro{}. Contando la última carta, serían 50 céntimos menos de beneficio.
       \item[f)] El espacio de hipótesis es desconocido para todos los receptores de cartas. Para estas personas, mientras vaya acertando el predictor, la función de crecimiento es $1$, por lo la credibilidad en el ajuste es total. Pero en realidad, la función de crecimiento de este modelo es $2^N$, siendo $N$ el número de partidos a predecir, por lo que la credibilidad del ajuste es muy baja al ser baja la probabilidad de que se dé el resultado esperado.
     \end{enumerate}
   \end{solucion}
