@@ -190,7 +190,7 @@
   \begin{solucion}
     Resolvemos por partes.
     \begin{enumerate}
-      \item[a)] Como el conjunto $\mathcal{H}$ es finito, la expresión que debemos utilizar para estimar $E_{out}$ es la desigualdad de Hoeffding. Lo único que tenemos que ajustar es $|\mathcal{H}|$. Es claro que $|\mathcal{H}| = \sum_{i=1}^3 |\mathcal{H}_i| = 1500$, ya que las tres funciones han sido propuestas por los propios algoritmos de aprendizaje.
+      \item[a)] Como el conjunto $\mathcal{H}$ es finito, la expresión que debemos utilizar para estimar $E_{out}$ es la desigualdad de Hoeffding. Lo único que tenemos que ajustar es $|\mathcal{H}|$. Es claro que $|\mathcal{H}| = \sum_{i=1}^3 |\mathcal{H}_i| = 1500$, siendo $\mathcal{H}_i$ el espacio de hipótesis para cada $g_i$. No es sólo $3$, ya que las tres funciones han sido propuestas por los propios algoritmos de aprendizaje, por lo que previamente han tenido que ser escogidas de cada uno de los espacios $\mathcal{H}_i$, que son de tamaño $500$.
       \item[b)] La contaminación es mayor si elegimos la función hipótesis en base a estos 100 ejemplos, ya que dependerá en mayor medida de estos 100 ejemplos. Si hubiéramos dejado dentro estos 100 elementos, habrán tenido peso en la elección de una hipótesis, o incluso contaminaríamos el aprendizaje como en el ejercicio anterior (el modelo conoce los datos), pero posiblemente esta contaminación sea más indirecta.
     \end{enumerate}
 
